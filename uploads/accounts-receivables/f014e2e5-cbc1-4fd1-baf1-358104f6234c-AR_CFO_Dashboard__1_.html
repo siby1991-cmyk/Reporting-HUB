@@ -1,0 +1,566 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agilysys HSG -- AR CFO Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Inter+Tight:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#F2F3F7; --card:#fff; --topbar:rgba(255,255,255,.98);
+  --t1:#0E1726; --t2:#2D3A4E; --t3:#64748B; --t4:#A0ADBF;
+  --p1:#1B4FD8; --p2:#2563EB; --p3:#3B82F6; --p4:#BFDBFE; --p5:#EFF6FF;
+  --accent:linear-gradient(135deg,#1B4FD8,#0EA5E9);
+  --bdr:rgba(0,0,0,.07); --bdr-c:rgba(0,0,0,.04);
+  --sh0:0 2px 8px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.04);
+  --sh1:0 8px 28px rgba(27,79,216,.15);
+  --up:#059669; --dn:#DC2626; --warn:#D97706;
+  --stripe:#F8FAFF; --nav-a:rgba(27,79,216,.08); --nav-h:rgba(27,79,216,.04);
+  --glow:rgba(27,79,216,.2); --sw:0px;
+  --font:'Inter',sans-serif; --mono:'JetBrains Mono',monospace; --head:'Inter Tight',sans-serif;
+  --r:14px; --r-sm:8px; --r-lg:20px;
+}
+[data-theme="dark"] {
+  --bg:#0B0F1A; --card:#141927; --topbar:rgba(20,25,39,.98);
+  --t1:#F0F4FF; --t2:#BCC8E0; --t3:#5E7099; --t4:#2D3A52;
+  --p1:#60A5FA; --p2:#93C5FD; --p3:#BFDBFE; --p4:#1E3A5F; --p5:#0F1D30;
+  --accent:linear-gradient(135deg,#3B82F6,#06B6D4);
+  --bdr:rgba(255,255,255,.08); --bdr-c:rgba(255,255,255,.04);
+  --sh0:0 2px 8px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.3);
+  --sh1:0 8px 28px rgba(0,0,0,.5);
+  --up:#34D399; --dn:#F87171; --warn:#FBBF24;
+  --stripe:rgba(255,255,255,.02); --nav-a:rgba(96,165,250,.10); --nav-h:rgba(96,165,250,.05);
+  --glow:rgba(96,165,250,.25);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:var(--font);font-size:13px;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased}
+.shell{display:flex;height:100vh;overflow:hidden;flex-direction:column}
+.sidebar{display:none}
+
+/* TOPBAR */
+.topbar{height:54px;padding:0 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:100;background:var(--topbar);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);transition:background .2s}
+.topbar-brand{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#logoImg{height:26px;width:auto;display:block;transition:filter .3s,opacity .3s}
+[data-theme="dark"] #logoImg{filter:brightness(0) invert(1);opacity:.9}
+.brand-divider{width:1px;height:22px;background:var(--bdr);flex-shrink:0;margin:0 4px}
+.top-period{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.picker-label{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);white-space:nowrap}
+.top-period select{background:var(--bg);color:var(--p1);border:1.5px solid var(--bdr);padding:5px 24px 5px 10px;border-radius:var(--r-lg);font-size:11px;font-weight:700;font-family:var(--font);cursor:pointer;appearance:none;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231B4FD8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .2s}
+.top-period select:focus{border-color:var(--p1)}
+.top-period select option{background:var(--card);color:var(--t1)}
+.top-nav{display:flex;align-items:center;gap:3px;flex:1;justify-content:center}
+.nav-item{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r-lg);cursor:pointer;color:var(--t3);font-size:11px;font-weight:600;transition:all .15s;border:1.5px solid transparent;white-space:nowrap}
+.nav-item:hover{color:var(--p1);background:var(--nav-h)}
+.nav-item.active{color:var(--p1);background:var(--nav-a);border-color:var(--bdr);font-weight:700}
+.nav-icon{font-size:12px;line-height:1;flex-shrink:0}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar-title-area{display:flex;flex-direction:column;align-items:flex-end;gap:1px;margin-right:4px}
+.topbar-page-title{font-family:var(--head);font-size:11px;font-weight:800;color:var(--t1);letter-spacing:-.2px}
+.topbar-sub{font-size:8.5px;color:var(--t3)}
+.tpill{background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:4px 12px;border-radius:var(--r-lg);letter-spacing:.3px;box-shadow:0 2px 8px var(--glow);font-family:var(--mono);white-space:nowrap}
+.theme-btn{background:var(--card);border:1.5px solid var(--bdr);color:var(--t2);width:32px;height:32px;border-radius:50%;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:var(--sh0)}
+.theme-btn:hover{background:var(--p1);color:#fff;border-color:var(--p1)}
+
+/* MAIN + CONTENT */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.content{flex:1;overflow-y:auto;padding:14px 20px 16px}
+.page{display:none}.page.active{display:block}
+
+/* CARDS */
+.card,.cc{background:var(--card);border:1px solid var(--bdr-c);border-radius:var(--r);box-shadow:var(--sh0);padding:16px;margin-bottom:12px;transition:background .2s,border-color .2s,box-shadow .2s}
+.card:hover,.cc:hover{box-shadow:var(--sh1)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ct{font-family:var(--head);font-size:12px;font-weight:700;color:var(--t1);letter-spacing:-.2px}
+.cs{font-size:9px;color:var(--t3)}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--bdr-c);border-radius:var(--r);padding:14px 14px 12px;position:relative;overflow:hidden;box-shadow:var(--sh0);transition:all .2s}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0}
+.kpi.k1::before{background:linear-gradient(90deg,#1B4FD8,#0EA5E9)}
+.kpi.k2::before{background:linear-gradient(90deg,#0891B2,#06B6D4)}
+.kpi.k3::before{background:linear-gradient(90deg,#059669,#10B981)}
+.kpi.k4::before{background:linear-gradient(90deg,#D97706,#F59E0B)}
+.kpi.k5::before{background:linear-gradient(90deg,#DC2626,#EF4444)}
+.kpi.k6::before{background:linear-gradient(90deg,#7C3AED,#A855F7)}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh1)}
+.kl{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.kv{font-size:20px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1;margin-bottom:6px;font-family:var(--mono)}
+.kd{font-size:8px}
+.krow{display:flex;align-items:center;gap:3px;margin-bottom:2px}
+.badge{background:var(--p5);color:var(--p1);font-size:6.5px;font-weight:700;padding:2px 6px;border-radius:10px;letter-spacing:.5px}
+.up{color:var(--up);font-weight:700}
+.down{color:var(--dn);font-weight:700}
+
+/* GRIDS */
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+
+/* TABLES */
+.tw{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse}
+table.tbl th{font-size:7.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);padding:8px 10px;text-align:right;border-bottom:1.5px solid var(--bdr);white-space:nowrap;background:var(--card);position:sticky;top:0;z-index:1}
+table.tbl th:first-child{text-align:left}
+table.tbl td{padding:7px 10px;border-bottom:1px solid var(--bdr-c);color:var(--t2);white-space:nowrap;font-size:11.5px;text-align:right;font-family:var(--mono)}
+table.tbl td:first-child{text-align:left;font-family:var(--font);font-weight:600;color:var(--t1);font-size:11px}
+table.tbl tbody tr:nth-child(even){background:var(--stripe)}
+table.tbl tbody tr:hover{background:var(--nav-h)}
+table.tbl tbody tr.hl td{font-weight:700;color:var(--t1)}
+table.tbl tbody tr.hl td:first-child{color:var(--p1)}
+
+/* PIVOT TABLE */
+.ptbl{width:100%;border-collapse:collapse}
+.ptbl th{font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);padding:5px 8px;border-bottom:1.5px solid var(--bdr);white-space:nowrap;text-align:right}
+.ptbl th:first-child{text-align:left}
+.ptbl td{padding:4px 8px;border-bottom:1px solid var(--bdr-c);text-align:right;font-size:10.5px;font-family:var(--mono);white-space:nowrap}
+.ptbl td:first-child{text-align:left;font-family:var(--font);font-weight:700;color:var(--t2);font-size:10px}
+.h0{background:rgba(27,79,216,.00)} .h1{background:rgba(27,79,216,.07)} .h2{background:rgba(27,79,216,.13)}
+.h3{background:rgba(27,79,216,.20)} .h4{background:rgba(27,79,216,.28)} .h5{background:rgba(27,79,216,.36)}
+.h6{background:rgba(27,79,216,.45)} .h7{background:rgba(27,79,216,.55);color:#fff!important}
+[data-theme="dark"] .h1{background:rgba(96,165,250,.08)} [data-theme="dark"] .h2{background:rgba(96,165,250,.15)}
+[data-theme="dark"] .h3{background:rgba(96,165,250,.22)} [data-theme="dark"] .h4{background:rgba(96,165,250,.30)}
+[data-theme="dark"] .h5{background:rgba(96,165,250,.38)} [data-theme="dark"] .h6{background:rgba(96,165,250,.47)}
+[data-theme="dark"] .h7{background:rgba(96,165,250,.60);color:#fff!important}
+
+/* PILLS */
+.prow{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.pill{padding:4px 12px;border-radius:var(--r-lg);font-size:9.5px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid var(--bdr);color:var(--t3);background:var(--card)}
+.pill:hover{border-color:var(--p1);color:var(--p1)}
+.pill.active{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 2px 8px var(--glow)}
+
+/* SEARCH */
+#hs{background:var(--card);border:1.5px solid var(--bdr);border-radius:var(--r-lg);padding:6px 14px;font-size:10.5px;color:var(--t1);font-family:var(--font);outline:none;width:200px;transition:border-color .2s}
+#hs:focus{border-color:var(--p1)}
+#hs::placeholder{color:var(--t4)}
+
+/* ABAR */
+.abar{height:5px;border-radius:3px;background:var(--bdr-c);overflow:hidden}
+.afill{height:100%;border-radius:3px;transition:width .3s}
+
+.piv-wrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="shell">
+<span id="sp" style="display:none"></span>
+<span id="gn" style="display:none"></span>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <img src="data:image/png;base64,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Drzy6oJ4YnICbMo5vQgo0v/363sp8LqAphRByQBEPogqkKqEUHnwggpCJeH5IX75q19HIOMuCacYAY+7NO9/n6GQCCERfCURksSdv/2vVB+Zi6mpIehJaY65Xlh///vfU3bMfvrTn6aeXQhBjuNQqVRK+s7UFMw5ppRKLWR6rE2NZsaMGUREKJfLqfN0dnailvQyf2/bdjKHs5qYbds0fPjwKiDvzMPaEdXzu9/9Lm6++ebEuJ42bRqGDh2KESNGYNiwYejXrx9WrlyJZcuWYdmyZXjooYcSypTW54kI559/PubMmYOOjo4ktqX1dR0PsywLSil8//vfpzlz5iSxsnK5DMuycM455+Cyyy7Dfvvtx4rFIogIHR0dWLRoEd1+++147LHHEhtNCAEpJY4++mhMnTo1YZRYlpVimWgCs47HSSnhui5M1cV0m2fZLZ8kDuc6eYwbexA74ogj6J//fAEAoeK3wxI27r7nDlxw4TmoeBXkclE2gueXyHUtxkAgRlHmt/YK28Dvf//7yOWpAOkrABYOP3Qiph57DAt8wPMIDQ0ci197j8779sUALCgVJnbLfvvth6985StJPymlsHHjRmzYsAEA8MILL2D27NlJ6YnBgwdj69at1NzczDTndPr06bjyyisTe59zDt/38eGHH5Jm6uRyucR+MwPqZnjplVdeIV1LRodkfN/HV77ylcR7as7PSy+9lLTtH5W/iNppp52GM844A8OHD4deMNva2rBmzRqUy2U88sgjWLZsGVpbWzFu3LiE0LBLvJg7YsMtXLiQBg0aRJdddhk9/fTTVEsimeriXXfdlVppLMtKpM+9996brPp6cmeve/fddyeqqF4pGxoa6LXXXktEvv6tKaV838ftt99OuVwuWdn0SrlgwQLavHkzmc+mHSt6hQ3DED/4wQ9S6gYAmjJlCpmrXi0VaEdtuOh+Q/zyl7cR51ZKJQdAvl9BxS8jVB4U+QhUGYoqqARtUFSBTwECUgiJsKW9gyzbJdspRJINNgEuXXvtT8ivRBJS24SX/9uPyBZNJLib9G8ul6MXX3yR9DhmJbm205RSuPPOO+noo4+md955JzUP9PenT5+e0moA0Pnnn09KKUgpE3XNHHfzWkEQ4OKLL66aP/3796fW1taUViKlxMqVK1OqpJbI3/72txPbUV+zXC4n80W/98wzz9B5551H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" alt="Agilysys" style="height:26px;width:auto;display:block" id="logoImg">
+    </div>
+    <div class="brand-divider"></div>
+    <div class="top-period">
+      <span class="picker-label">Period</span>
+      <select id="mp"></select>
+    </div>
+    <div class="brand-divider"></div>
+    <nav class="top-nav">
+      <div class="nav-item active" data-page="overview"><div class="nav-icon">&#128200;</div><span>Overview</span></div>
+      <div class="nav-item" data-page="aging"><div class="nav-icon">&#128450;</div><span>Aging</span></div>
+      <div class="nav-item" data-page="trends"><div class="nav-icon">&#128201;</div><span>Trends</span></div>
+      <div class="nav-item" data-page="quarterly"><div class="nav-icon">&#128197;</div><span>Quarterly</span></div>
+      <div class="nav-item" data-page="pivot"><div class="nav-icon">&#128290;</div><span>YoY Pivot</span></div>
+      <div class="nav-item" data-page="history"><div class="nav-icon">&#128203;</div><span>History</span></div>
+    </nav>
+    <div class="topbar-right">
+      <div class="topbar-title-area">
+        <span class="topbar-page-title" id="pt">Financial Overview</span>
+        <span class="topbar-sub" id="ps">AR &middot; KPI Snapshot</span>
+      </div>
+      <div class="tpill" id="pp">--</div>
+      <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div class="kpi-strip" id="ks"></div>
+    <div class="g21">
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">Gross AR -- Trailing 12 Months</div>
+        <canvas id="ovT" height="145"></canvas>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">Aging Mix</span><span class="cs" id="aml"></span></div>
+        <canvas id="ovD" height="190" style="padding:8px 10px 4px"></canvas>
+      </div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="card">
+      <div class="ch"><span class="ct">Trailing 12 Months</span><span class="cs">All Key Metrics</span></div>
+      <div class="tw"><table id="ovTbl" class="tbl"></table></div>
+    </div>
+  </div>
+
+  <!-- AGING -->
+  <div class="page" id="page-aging">
+    <div class="g2">
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">Aging Composition</div>
+        <canvas id="agD" height="205"></canvas>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">Bucket Breakdown</span><span class="cs" id="agml"></span></div>
+        <div class="tw"><table id="agDtl" class="tbl"></table></div>
+      </div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="cc">
+      <div class="ct">Aging Trend -- <span id="agbl" style="color:var(--p1)">Current</span></div>
+      <div class="prow" id="agBtns"></div>
+      <canvas id="agTr" height="100"></canvas>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Last 13 Months -- Aging by Bucket</span><span class="cs">$M</span></div>
+      <div class="tw"><table id="agFull" class="tbl"></table></div>
+    </div>
+  </div>
+
+  <!-- TRENDS -->
+  <div class="page" id="page-trends">
+    <div class="prow" id="tBtns"></div>
+    <div class="cc">
+      <div class="ct" id="tT">Gross AR -- Full History</div>
+      <canvas id="tMain" height="110"></canvas>
+    </div>
+    <div class="g2">
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">Collections vs Billings <span style="font-size:9px;font-weight:500;color:var(--t3)">(24 months)</span></div>
+        <canvas id="tCB" height="150"></canvas>
+      </div>
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">Over 90+% Mix <span style="font-size:9px;font-weight:500;color:var(--t3)">(24 months)</span></div>
+        <canvas id="tO9" height="150"></canvas>
+      </div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="g2">
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">% Collected of Prior Month AR</div>
+        <canvas id="tPC" height="140"></canvas>
+      </div>
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">Net AR vs Gross AR</div>
+        <canvas id="tNG" height="140"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUARTERLY -->
+  <div class="page" id="page-quarterly">
+    <div class="g2">
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">Collections vs Billings ($M)</div>
+        <canvas id="qCB" height="190"></canvas>
+      </div>
+      <div class="cc" style="margin-bottom:0">
+        <div class="ct">Collections / Billings Ratio</div>
+        <canvas id="qR" height="190"></canvas>
+      </div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="card">
+      <div class="ch"><span class="ct">Quarterly Detail</span><span class="cs">FY2023 onwards</span></div>
+      <div class="tw"><table id="qTbl" class="tbl"></table></div>
+    </div>
+  </div>
+
+  <!-- PIVOT -->
+  <div class="page" id="page-pivot">
+    <div class="cc">
+      <div class="ct">Gross AR ($M) -- Year-over-Year Heat Map</div>
+      <p style="font-size:9px;color:var(--t3);margin:4px 0 12px">Deeper blue = higher Gross AR &middot; hover for exact value</p>
+      <div class="piv-wrap"><table class="ptbl" id="pivT"></table></div>
+    </div>
+    <div class="cc">
+      <div class="ct">Monthly AR -- Year-over-Year Lines <span style="font-size:9px;font-weight:500;color:var(--t3)">(last 7 years)</span></div>
+      <canvas id="yoyL" height="125"></canvas>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="page" id="page-history">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <h2 style="font-family:var(--head);font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.3px">Full History <span style="font-size:11px;font-weight:500;color:var(--t3)" id="hcount"></span></h2>
+      <input id="hs" type="text" placeholder="&#128269;  Filter by month..." style="margin-left:auto">
+    </div>
+    <div class="card">
+      <div class="tw" style="max-height:calc(100vh - 180px);overflow-y:auto">
+        <table id="hTbl" class="tbl"></table>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+
+const DATA = {"months":[{"month":"Apr-2017","gross_ar":19200070.14,"current":5932721.39,"days_30":6352044.18,"days_60":2933328.42,"days_90":1223128.23,"days_120":962478.26,"days_360":942041.26,"days_361":854328.40,"net_credits":-1463417.68,"net_ar":17736652.46,"collections":9977000.00,"billings":0.00,"deposits":0.00,"over90_pct":0.143689,"over90_bal":2758847.92,"pct_coll":0.000000},{"month":"May-2017","gross_ar":19354744.29,"current":4603652.16,"days_30":7933560.76,"days_60":2725943.89,"days_90":1484289.48,"days_120":687271.82,"days_360":1082077.71,"days_361":837948.47,"net_credits":-1521502.27,"net_ar":17833242.02,"collections":9776000.00,"billings":0.00,"deposits":0.00,"over90_pct":0.134711,"over90_bal":2607298.00,"pct_coll":0.509165},{"month":"Jun-2017","gross_ar":21759929.72,"current":5150066.23,"days_30":8102762.53,"days_60":3665927.80,"days_90":1723441.38,"days_120":1129621.99,"days_360":1241746.88,"days_361":746362.91,"net_credits":-1340560.25,"net_ar":20419369.47,"collections":9423000.00,"billings":0.00,"deposits":0.00,"over90_pct":0.143279,"over90_bal":3117731.78,"pct_coll":0.486857},{"month":"Jul-2017","gross_ar":18023401.24,"current":3374672.46,"days_30":4720760.22,"days_60":4054246.20,"days_90":2317438.32,"days_120":944327.77,"days_360":1762587.65,"days_361":849368.62,"net_credits":-1335923.92,"net_ar":16687477.32,"collections":10214459.00,"billings":0.00,"deposits":0.00,"over90_pct":0.197315,"over90_bal":3556284.04,"pct_coll":0.469416},{"month":"Aug-2017","gross_ar":16039637.40,"current":3622962.35,"days_30":5423720.00,"days_60":1740690.90,"days_90":1620686.86,"days_120":964836.26,"days_360":1829502.76,"days_361":837238.27,"net_credits":-1562871.11,"net_ar":14476766.29,"collections":10285106.00,"billings":0.00,"deposits":0.00,"over90_pct":0.226413,"over90_bal":3631577.29,"pct_coll":0.570653},{"month":"Sep-2017","gross_ar":16700904.79,"current":4450601.07,"days_30":5049180.57,"days_60":2382611.69,"days_90":1029354.34,"days_120":1222881.39,"days_360":1684207.12,"days_361":882068.61,"net_credits":-1389326.40,"net_ar":15311578.39,"collections":8519422.00,"billings":0.00,"deposits":0.00,"over90_pct":0.226883,"over90_bal":3789157.12,"pct_coll":0.531148},{"month":"Oct-2017","gross_ar":28613739.86,"current":6717878.66,"days_30":16207887.88,"days_60":2385350.51,"days_90":1113900.88,"days_120":638482.00,"days_360":1365427.00,"days_361":184812.93,"net_credits":-1218195.65,"net_ar":27395544.21,"collections":9187000.00,"billings":0.00,"deposits":0.00,"over90_pct":0.076492,"over90_bal":2188721.93,"pct_coll":0.550090},{"month":"Nov-2017","gross_ar":22625629.44,"current":3111378.67,"days_30":7677641.95,"days_60":8214705.51,"days_90":1303382.04,"days_120":715983.87,"days_360":1339010.05,"days_361":263527.35,"net_credits":-1428983.90,"net_ar":21196645.54,"collections":13091272.02,"billings":0.00,"deposits":0.00,"over90_pct":0.102473,"over90_bal":2318521.27,"pct_coll":0.457517},{"month":"Mar-2018","gross_ar":21148587.41,"current":9859113.25,"days_30":5771186.07,"days_60":2390539.04,"days_90":977331.01,"days_120":470508.49,"days_360":1516304.38,"days_361":163605.17,"net_credits":-1627244.76,"net_ar":19521342.65,"collections":10586000.00,"billings":16134194.00,"deposits":0.00,"over90_pct":0.101681,"over90_bal":2150418.04,"pct_coll":0.467876},{"month":"Apr-2018","gross_ar":17253324.64,"current":5210322.12,"days_30":6605067.32,"days_60":2516158.69,"days_90":1157122.19,"days_120":441091.47,"days_360":1141922.75,"days_361":181640.10,"net_credits":-1570660.35,"net_ar":15682664.29,"collections":11132000.00,"billings":8259386.00,"deposits":0.00,"over90_pct":0.102279,"over90_bal":1764654.32,"pct_coll":0.526371},{"month":"May-2018","gross_ar":18309721.87,"current":6018380.38,"days_30":6569927.83,"days_60":2237884.08,"days_90":1532919.41,"days_120":1019580.17,"days_360":817666.00,"days_361":113364.00,"net_credits":-1816385.31,"net_ar":16493336.56,"collections":10035000.00,"billings":9506099.22,"deposits":0.00,"over90_pct":0.106534,"over90_bal":1950610.17,"pct_coll":0.581627},{"month":"Jun-2018","gross_ar":20998129.10,"current":6165005.08,"days_30":7949239.51,"days_60":3474246.46,"days_90":1198984.34,"days_120":914966.79,"days_360":1110399.03,"days_361":185287.90,"net_credits":-1345416.44,"net_ar":19652712.66,"collections":9103079.78,"billings":12077196.00,"deposits":0.00,"over90_pct":0.105279,"over90_bal":2210653.72,"pct_coll":0.497172},{"month":"Jul-2018","gross_ar":19271831.68,"current":5189429.34,"days_30":6084967.95,"days_60":3953297.89,"days_90":1393299.47,"days_120":1456081.66,"days_360":1037655.09,"days_361":157100.29,"net_credits":-1303334.82,"net_ar":17968496.86,"collections":10632000.00,"billings":9221430.86,"deposits":0.00,"over90_pct":0.137550,"over90_bal":2650837.04,"pct_coll":0.506331},{"month":"Aug-2018","gross_ar":18599552.38,"current":5427919.38,"days_30":5418798.15,"days_60":3058632.91,"days_90":2009284.51,"days_120":836221.51,"days_360":1678832.04,"days_361":169863.89,"net_credits":-1260906.70,"net_ar":17338645.68,"collections":11048000.00,"billings":9153854.01,"deposits":0.00,"over90_pct":0.144354,"over90_bal":2684917.44,"pct_coll":0.573272},{"month":"Sep-2018","gross_ar":19822863.80,"current":6988030.51,"days_30":5946347.55,"days_60":2704453.82,"days_90":1729556.30,"days_120":962258.39,"days_360":1225639.96,"days_361":266577.27,"net_credits":-774221.03,"net_ar":19048642.77,"collections":9297000.00,"billings":11559850.07,"deposits":0.00,"over90_pct":0.123820,"over90_bal":2454475.62,"pct_coll":0.499851},{"month":"Oct-2018","gross_ar":31555624.78,"current":9912471.71,"days_30":14668905.06,"days_60":2686473.67,"days_90":1370365.81,"days_120":873999.66,"days_360":1881328.88,"days_361":162080.00,"net_credits":-579853.81,"net_ar":30975770.97,"collections":9838738.00,"billings":21584199.49,"deposits":0.00,"over90_pct":0.092453,"over90_bal":2917408.54,"pct_coll":0.496333},{"month":"Nov-2018","gross_ar":27561726.48,"current":7625095.65,"days_30":7040394.84,"days_60":8218269.58,"days_90":1589949.86,"days_120":925280.11,"days_360":1931026.42,"days_361":231710.02,"net_credits":-663371.27,"net_ar":26898355.21,"collections":13633612.00,"billings":8637387.00,"deposits":0.00,"over90_pct":0.112040,"over90_bal":3088016.55,"pct_coll":0.432050},{"month":"Dec-2018","gross_ar":32932945.48,"current":11536526.69,"days_30":9956244.18,"days_60":4647807.98,"days_90":3594575.11,"days_120":1051868.57,"days_360":2019144.18,"days_361":126778.77,"net_credits":-637788.15,"net_ar":32295157.33,"collections":10988681.00,"billings":17433333.86,"deposits":0.00,"over90_pct":0.097100,"over90_bal":3197791.53,"pct_coll":0.398693},{"month":"Jan-2019","gross_ar":32507623.21,"current":11434204.71,"days_30":8652884.75,"days_60":5778478.19,"days_90":2403311.26,"days_120":1994746.63,"days_360":2081801.32,"days_361":162196.36,"net_credits":-657015.54,"net_ar":31850607.67,"collections":12660040.84,"billings":12347363.00,"deposits":0.00,"over90_pct":0.130392,"over90_bal":4238744.30,"pct_coll":0.384419},{"month":"Feb-2019","gross_ar":29079254.57,"current":9072704.84,"days_30":8898309.89,"days_60":3979311.45,"days_90":3357715.18,"days_120":967319.24,"days_360":2622176.10,"days_361":181717.87,"net_credits":-574555.07,"net_ar":28504699.50,"collections":14779365.00,"billings":11072144.18,"deposits":0.00,"over90_pct":0.129687,"over90_bal":3771213.21,"pct_coll":0.454643},{"month":"Mar-2019","gross_ar":26873779.54,"current":7165483.16,"days_30":8914479.30,"days_60":4170369.41,"days_90":2070870.31,"days_120":1900558.59,"days_360":2443127.36,"days_361":208891.40,"net_credits":-463996.03,"net_ar":26409783.51,"collections":15293369.00,"billings":13622098.00,"deposits":0.00,"over90_pct":0.169406,"over90_bal":4552577.35,"pct_coll":0.525920},{"month":"Apr-2019","gross_ar":23109491.76,"current":6073964.12,"days_30":5633854.89,"days_60":4671196.23,"days_90":1842404.18,"days_120":1144616.93,"days_360":3450845.37,"days_361":292610.05,"net_credits":-609815.60,"net_ar":22499676.16,"collections":11546834.00,"billings":7739778.37,"deposits":0.00,"over90_pct":0.211518,"over90_bal":4888072.35,"pct_coll":0.429669},{"month":"May-2019","gross_ar":24425584.16,"current":6540324.11,"days_30":7455088.00,"days_60":2630564.38,"days_90":2385991.48,"days_120":1531054.60,"days_360":3552874.40,"days_361":329687.18,"net_credits":-589449.28,"net_ar":23836134.88,"collections":11978819.00,"billings":12376507.28,"deposits":0.00,"over90_pct":0.221637,"over90_bal":5413616.18,"pct_coll":0.518351},{"month":"Jun-2019","gross_ar":26169617.71,"current":8144312.09,"days_30":6867597.11,"days_60":4073651.58,"days_90":1678878.69,"days_120":1374621.74,"days_360":3623349.66,"days_361":407206.84,"net_credits":-676496.45,"net_ar":25493121.26,"collections":11498112.00,"billings":12936692.56,"deposits":0.00,"over90_pct":0.206544,"over90_bal":5405178.23,"pct_coll":0.470741},{"month":"Jul-2019","gross_ar":22291314.03,"current":5883723.56,"days_30":5422818.10,"days_60":3674473.89,"days_90":1630970.98,"days_120":1169629.86,"days_360":4048598.90,"days_361":461098.74,"net_credits":-842096.51,"net_ar":21449217.52,"collections":11697626.10,"billings":7799519.38,"deposits":0.00,"over90_pct":0.254778,"over90_bal":5679327.50,"pct_coll":0.446993},{"month":"Aug-2019","gross_ar":21343752.91,"current":6026315.57,"days_30":6799997.60,"days_60":2330872.75,"days_90":1774133.29,"days_120":649476.35,"days_360":3253498.82,"days_361":509458.54,"net_credits":-652863.03,"net_ar":20690889.88,"collections":13377000.00,"billings":11120443.01,"deposits":0.00,"over90_pct":0.206732,"over90_bal":4412433.71,"pct_coll":0.600099},{"month":"Sep-2019","gross_ar":23620104.29,"current":9517831.17,"days_30":6462960.98,"days_60":2548845.51,"days_90":1067435.04,"days_120":1040472.60,"days_360":2447555.78,"days_361":535003.20,"net_credits":-710408.67,"net_ar":22909695.61,"collections":11334732.39,"billings":14771587.33,"deposits":0.00,"over90_pct":0.170322,"over90_bal":4023031.58,"pct_coll":0.531056},{"month":"Oct-2019","gross_ar":20191330.02,"current":6164820.27,"days_30":5452894.65,"days_60":3221053.83,"days_90":1436474.77,"days_120":842227.46,"days_360":2473374.71,"days_361":600484.33,"net_credits":-762106.70,"net_ar":19429223.32,"collections":10669403.24,"billings":7081656.53,"deposits":0.00,"over90_pct":0.193949,"over90_bal":3916086.50,"pct_coll":0.451709},{"month":"Nov-2019","gross_ar":29926954.76,"current":9838576.29,"days_30":12050017.17,"days_60":2704206.91,"days_90":1798117.98,"days_120":664219.18,"days_360":2203993.73,"days_361":667823.49,"net_credits":-667489.14,"net_ar":29259465.62,"collections":13519758.00,"billings":22219814.21,"deposits":0.00,"over90_pct":0.118156,"over90_bal":3536036.41,"pct_coll":0.669582},{"month":"Dec-2019","gross_ar":30714853.22,"current":9952450.95,"days_30":9592516.50,"days_60":5536838.18,"days_90":1510285.67,"days_120":1362303.33,"days_360":1993115.39,"days_361":767343.20,"net_credits":-697866.76,"net_ar":30016986.46,"collections":16495319.86,"billings":15412758.00,"deposits":0.00,"over90_pct":0.134227,"over90_bal":4122761.93,"pct_coll":0.551186},{"month":"Jan-2020","gross_ar":34526865.85,"current":15612183.93,"days_30":7561643.22,"days_60":4405719.31,"days_90":1696151.39,"days_120":2635010.39,"days_360":1900871.58,"days_361":715286.02,"net_credits":-895562.34,"net_ar":33631303.51,"collections":14292914.67,"billings":19415288.83,"deposits":0.00,"over90_pct":0.152089,"over90_bal":5251168.00,"pct_coll":0.465342},{"month":"Feb-2020","gross_ar":35579841.07,"current":15007155.18,"days_30":9086146.00,"days_60":4023153.28,"days_90":3319669.70,"days_120":1560360.30,"days_360":1982940.25,"days_361":600416.35,"net_credits":-687556.16,"net_ar":34892284.91,"collections":15552844.61,"billings":15716043.51,"deposits":244542.56,"over90_pct":0.116462,"over90_bal":4143716.91,"pct_coll":0.450456},{"month":"Mar-2020","gross_ar":38796341.34,"current":15914985.72,"days_30":10711488.95,"days_60":4685045.95,"days_90":2786502.07,"days_120":1734586.31,"days_360":2452174.88,"days_361":511557.46,"net_credits":-512144.70,"net_ar":38284196.63,"collections":12349312.00,"billings":17303227.43,"deposits":375988.18,"over90_pct":0.121102,"over90_bal":4698318.65,"pct_coll":0.347087},{"month":"Apr-2020","gross_ar":36123522.96,"current":10464120.00,"days_30":9689977.32,"days_60":7276114.32,"days_90":2820034.05,"days_120":2188489.20,"days_360":3264172.72,"days_361":420615.36,"net_credits":-574854.23,"net_ar":35548668.73,"collections":9984290.31,"billings":6829291.93,"deposits":283862.11,"over90_pct":0.162589,"over90_bal":5873277.28,"pct_coll":0.257351},{"month":"May-2020","gross_ar":38999661.90,"current":7758743.72,"days_30":10667095.92,"days_60":6973362.27,"days_90":5552187.80,"days_120":1877325.19,"days_360":5389703.93,"days_361":781243.07,"net_credits":-662638.14,"net_ar":38337023.76,"collections":8891055.00,"billings":8886472.23,"deposits":708586.91,"over90_pct":0.206368,"over90_bal":8048272.19,"pct_coll":0.246129},{"month":"Jun-2020","gross_ar":35623780.31,"current":7353836.23,"days_30":6535362.83,"days_60":7612056.73,"days_90":4579028.52,"days_120":3254670.63,"days_360":5500111.65,"days_361":788713.71,"net_credits":-883729.93,"net_ar":34740050.37,"collections":12188117.26,"billings":8947064.00,"deposits":722210.84,"over90_pct":0.267897,"over90_bal":9543495.99,"pct_coll":0.312519},{"month":"Jul-2020","gross_ar":28223420.21,"current":6273858.62,"days_30":6455122.64,"days_60":3446598.54,"days_90":2836197.68,"days_120":2687430.00,"days_360":5984032.46,"days_361":540180.26,"net_credits":-874910.08,"net_ar":27348510.14,"collections":16392291.90,"billings":7427385.83,"deposits":921689.92,"over90_pct":0.326383,"over90_bal":9211642.73,"pct_coll":0.460150},{"month":"Aug-2020","gross_ar":27419140.27,"current":5674983.53,"days_30":6638872.93,"days_60":3785309.31,"days_90":1985516.44,"days_120":1930843.63,"days_360":6803783.07,"days_361":599831.35,"net_credits":-949437.18,"net_ar":26469703.09,"collections":9811165.71,"billings":8679244.60,"deposits":1083144.93,"over90_pct":0.340436,"over90_bal":9334458.06,"pct_coll":0.347625},{"month":"Sep-2020","gross_ar":24968709.86,"current":7232837.58,"days_30":5192237.43,"days_60":3362020.50,"days_90":2333289.01,"days_120":1212182.56,"days_360":5055719.22,"days_361":580423.55,"net_credits":-791349.95,"net_ar":24177359.92,"collections":12416442.00,"billings":9919906.22,"deposits":1526337.67,"over90_pct":0.274276,"over90_bal":6848325.34,"pct_coll":0.452838},{"month":"Oct-2020","gross_ar":22117058.93,"current":5629153.49,"days_30":6710436.12,"days_60":2558659.94,"days_90":1742758.67,"days_120":957371.97,"days_360":3955552.24,"days_361":563126.50,"net_credits":-808345.58,"net_ar":21308713.35,"collections":12145916.00,"billings":8002629.34,"deposits":798443.07,"over90_pct":0.247594,"over90_bal":5476050.70,"pct_coll":0.486445},{"month":"Nov-2020","gross_ar":21720915.20,"current":6595996.60,"days_30":4636136.33,"days_60":3585176.71,"days_90":1604810.82,"days_120":1179064.42,"days_360":3491388.48,"days_361":628341.84,"net_credits":-812143.10,"net_ar":20908772.10,"collections":8752894.53,"billings":7298512.36,"deposits":1152123.73,"over90_pct":0.243949,"over90_bal":5298794.75,"pct_coll":0.395753},{"month":"Dec-2020","gross_ar":36980006.31,"current":13692477.49,"days_30":13816100.29,"days_60":2419870.03,"days_90":2321426.85,"days_120":1316790.84,"days_360":2645191.85,"days_361":768148.95,"net_credits":-476631.84,"net_ar":36503374.47,"collections":14397379.00,"billings":21704484.32,"deposits":783550.26,"over90_pct":0.127911,"over90_bal":4730131.65,"pct_coll":0.662835},{"month":"Jan-2021","gross_ar":34589581.25,"current":9856418.28,"days_30":10041802.89,"days_60":6014389.13,"days_90":4067541.53,"days_120":1126552.02,"days_360":2634104.13,"days_361":848773.26,"net_credits":-402348.57,"net_ar":34187232.68,"collections":13219960.99,"billings":11036351.03,"deposits":686839.30,"over90_pct":0.133261,"over90_bal":4609429.42,"pct_coll":0.357489},{"month":"Feb-2021","gross_ar":35254803.00,"current":10411380.06,"days_30":8847124.60,"days_60":7542292.67,"days_90":3993115.45,"days_120":965489.92,"days_360":2701045.72,"days_361":794354.59,"net_credits":-554376.32,"net_ar":34700426.68,"collections":10166753.00,"billings":10414606.03,"deposits":405243.59,"over90_pct":0.126533,"over90_bal":4460890.23,"pct_coll":0.293925},{"month":"Mar-2021","gross_ar":30719264.23,"current":12786636.91,"days_30":7309442.46,"days_60":4072283.77,"days_90":2194380.25,"days_120":1585780.86,"days_360":2020257.19,"days_361":750482.79,"net_credits":-543205.22,"net_ar":30176059.01,"collections":19595538.48,"billings":13708273.96,"deposits":1723917.67,"over90_pct":0.141817,"over90_bal":4356520.84,"pct_coll":0.555826},{"month":"Apr-2021","gross_ar":28331548.59,"current":11284132.44,"days_30":7967759.21,"days_60":2701205.03,"days_90":1956862.60,"days_120":1602512.58,"days_360":2155587.38,"days_361":663489.34,"net_credits":-616568.50,"net_ar":27714980.09,"collections":13393665.65,"billings":10322338.61,"deposits":1710516.00,"over90_pct":0.156066,"over90_bal":4421589.31,"pct_coll":0.436002},{"month":"May-2021","gross_ar":31311345.26,"current":8940217.69,"days_30":11861801.55,"days_60":4015534.95,"days_90":2026073.65,"days_120":1307411.61,"days_360":2493748.61,"days_361":666557.21,"net_credits":-495771.90,"net_ar":30815573.36,"collections":10087045.00,"billings":13380280.33,"deposits":866107.85,"over90_pct":0.142687,"over90_bal":4467717.43,"pct_coll":0.356036},{"month":"Jun-2021","gross_ar":28386719.40,"current":8898117.79,"days_30":6459716.45,"days_60":5872886.55,"days_90":2626017.28,"days_120":1242414.20,"days_360":2582218.93,"days_361":705348.20,"net_credits":-537830.23,"net_ar":27848889.17,"collections":16272583.00,"billings":12019683.06,"deposits":1909481.82,"over90_pct":0.159581,"over90_bal":4529981.33,"pct_coll":0.519702},{"month":"Jul-2021","gross_ar":25987126.75,"current":7761275.73,"days_30":7425472.19,"days_60":3614031.84,"days_90":3059348.72,"days_120":1331632.66,"days_360":2153867.11,"days_361":641498.50,"net_credits":-490402.55,"net_ar":25496724.20,"collections":12406043.55,"billings":11193827.07,"deposits":1080698.95,"over90_pct":0.158809,"over90_bal":4126998.27,"pct_coll":0.437037},{"month":"Aug-2021","gross_ar":28254002.46,"current":10205104.62,"days_30":7031575.07,"days_60":3804221.18,"days_90":1906468.42,"days_120":2053271.44,"days_360":2632999.42,"days_361":620362.31,"net_credits":-528132.11,"net_ar":27725870.35,"collections":11231233.40,"billings":13172403.12,"deposits":1095288.14,"over90_pct":0.187819,"over90_bal":5306633.16,"pct_coll":0.432185},{"month":"Sep-2021","gross_ar":23853467.24,"current":8396167.10,"days_30":6394434.41,"days_60":2642289.07,"days_90":2332908.56,"days_120":925226.61,"days_360":2605774.62,"days_361":556666.87,"net_credits":-647310.98,"net_ar":23206156.26,"collections":15318991.72,"billings":10131452.15,"deposits":889814.31,"over90_pct":0.171366,"over90_bal":4087668.10,"pct_coll":0.542188},{"month":"Oct-2021","gross_ar":21272846.53,"current":7428721.33,"days_30":6136853.10,"days_60":2685557.87,"days_90":1142865.43,"days_120":1159797.35,"days_360":2222618.26,"days_361":496433.19,"net_credits":-572486.73,"net_ar":20700359.80,"collections":13223329.22,"billings":10306290.75,"deposits":1320474.22,"over90_pct":0.182338,"over90_bal":3878848.80,"pct_coll":0.554357},{"month":"Nov-2021","gross_ar":30031156.34,"current":10566866.00,"days_30":12226237.55,"days_60":2720537.28,"days_90":1405628.68,"days_120":529023.34,"days_360":2210147.18,"days_361":372716.30,"net_credits":-515312.39,"net_ar":29515843.95,"collections":14009102.38,"billings":22526197.77,"deposits":1240276.01,"over90_pct":0.103622,"over90_bal":3111886.82,"pct_coll":0.658544},{"month":"Dec-2021","gross_ar":32299212.71,"current":14908844.31,"days_30":7680324.16,"days_60":5687747.11,"days_90":1144553.12,"days_120":561895.09,"days_360":1875412.53,"days_361":440436.39,"net_credits":-613777.60,"net_ar":31685435.11,"collections":20727153.22,"billings":19296695.11,"deposits":2124907.50,"over90_pct":0.089096,"over90_bal":2877744.01,"pct_coll":0.690188},{"month":"Jan-2022","gross_ar":28231979.02,"current":13556182.43,"days_30":6563373.55,"days_60":3015553.54,"days_90":2867954.02,"days_120":427430.89,"days_360":1429822.74,"days_361":371661.85,"net_credits":-846816.60,"net_ar":27385162.42,"collections":16649033.63,"billings":15555857.83,"deposits":1087920.60,"over90_pct":0.078950,"over90_bal":2228915.48,"pct_coll":0.515463},{"month":"Feb-2022","gross_ar":29437091.34,"current":12725096.02,"days_30":8773326.08,"days_60":2997645.43,"days_90":1805827.15,"days_120":1953762.51,"days_360":897551.56,"days_361":283882.58,"net_credits":-744268.49,"net_ar":28692822.85,"collections":13279667.45,"billings":12226687.48,"deposits":1447285.01,"over90_pct":0.106505,"over90_bal":3135196.64,"pct_coll":0.470377},{"month":"Mar-2022","gross_ar":27178435.08,"current":13863069.24,"days_30":6358631.87,"days_60":3302441.81,"days_90":1323102.33,"days_120":791635.83,"days_360":1389732.21,"days_361":149821.79,"net_credits":-704593.24,"net_ar":26473841.84,"collections":18563034.10,"billings":18995398.75,"deposits":1202138.65,"over90_pct":0.085774,"over90_bal":2331189.83,"pct_coll":0.630600},{"month":"Apr-2022","gross_ar":26524719.32,"current":11617292.51,"days_30":7020537.38,"days_60":3310529.84,"days_90":2225256.47,"days_120":698748.62,"days_360":1572409.17,"days_361":79945.33,"net_credits":-783535.18,"net_ar":25741184.14,"collections":14391649.00,"billings":11660781.00,"deposits":1578952.34,"over90_pct":0.088638,"over90_bal":2351103.12,"pct_coll":0.529525},{"month":"May-2022","gross_ar":25780841.73,"current":11471659.51,"days_30":7269753.63,"days_60":3544065.24,"days_90":1556916.73,"days_120":536500.18,"days_360":1338904.49,"days_361":63041.95,"net_credits":-675735.51,"net_ar":25105106.21,"collections":15612961.80,"billings":15568314.70,"deposits":1349987.89,"over90_pct":0.075189,"over90_bal":1938446.61,"pct_coll":0.588619},{"month":"Jun-2022","gross_ar":26220593.71,"current":11010995.33,"days_30":7657992.84,"days_60":3267890.33,"days_90":2095927.55,"days_120":1036933.28,"days_360":986699.29,"days_361":164155.08,"net_credits":-577451.70,"net_ar":25643142.01,"collections":14743156.61,"billings":14744589.72,"deposits":1196206.78,"over90_pct":0.083438,"over90_bal":2187787.65,"pct_coll":0.571865},{"month":"Jul-2022","gross_ar":24095674.58,"current":8374726.95,"days_30":6846909.01,"days_60":3884853.16,"days_90":1858995.41,"days_120":1515926.38,"days_360":1461087.65,"days_361":153176.01,"net_credits":-524977.40,"net_ar":23570697.17,"collections":13694747.00,"billings":11018860.86,"deposits":826762.11,"over90_pct":0.129907,"over90_bal":3130190.04,"pct_coll":0.522290},{"month":"Aug-2022","gross_ar":27508138.04,"current":13281497.70,"days_30":5926878.82,"days_60":3178921.09,"days_90":2044367.45,"days_120":982590.95,"days_360":1942716.04,"days_361":151165.98,"net_credits":-497655.36,"net_ar":27010482.68,"collections":14004649.56,"billings":17401992.11,"deposits":1282005.20,"over90_pct":0.111839,"over90_bal":3076472.98,"pct_coll":0.581210},{"month":"Sep-2022","gross_ar":25217314.40,"current":11068535.12,"days_30":7648267.83,"days_60":2245409.39,"days_90":1743581.84,"days_120":1130167.04,"days_360":1398938.53,"days_361":-17585.35,"net_credits":-745888.51,"net_ar":24471425.90,"collections":16487108.31,"billings":14513676.73,"deposits":799178.89,"over90_pct":0.099595,"over90_bal":2511520.22,"pct_coll":0.599354},{"month":"Oct-2022","gross_ar":28261115.03,"current":12839415.62,"days_30":8548850.88,"days_60":3451477.67,"days_90":1139599.16,"days_120":788475.61,"days_360":1528280.23,"days_361":-34984.13,"net_credits":-834665.54,"net_ar":27426449.49,"collections":13942385.12,"billings":16394501.04,"deposits":1876332.77,"over90_pct":0.080739,"over90_bal":2281771.71,"pct_coll":0.552889},{"month":"Nov-2022","gross_ar":43004237.50,"current":23625488.33,"days_30":11450478.14,"days_60":4024400.67,"days_90":1697316.17,"days_120":856956.89,"days_360":1585144.31,"days_361":-235547.01,"net_credits":-552008.25,"net_ar":42452229.25,"collections":18133764.97,"billings":32063702.84,"deposits":1373411.74,"over90_pct":0.051310,"over90_bal":2206554.19,"pct_coll":0.641651},{"month":"Dec-2022","gross_ar":37827223.90,"current":16844955.39,"days_30":11814172.03,"days_60":4709358.81,"days_90":1725993.23,"days_120":809888.06,"days_360":1940552.36,"days_361":-17695.98,"net_credits":-525484.79,"net_ar":37301739.11,"collections":26514584.32,"billings":22106464.50,"deposits":1070831.89,"over90_pct":0.072243,"over90_bal":2732744.44,"pct_coll":0.616557},{"month":"Jan-2023","gross_ar":32665678.56,"current":13850555.71,"days_30":9440753.84,"days_60":5076635.09,"days_90":1717064.23,"days_120":836979.85,"days_360":1725708.92,"days_361":17980.93,"net_credits":-696248.89,"net_ar":31969429.67,"collections":17358483.00,"billings":12520247.47,"deposits":1345844.00,"over90_pct":0.079002,"over90_bal":2580669.69,"pct_coll":0.458889},{"month":"Feb-2023","gross_ar":36649009.38,"current":13967130.40,"days_30":12430471.27,"days_60":4831353.64,"days_90":3099345.27,"days_120":847544.32,"days_360":1470693.41,"days_361":2471.06,"net_credits":-580525.82,"net_ar":36068483.56,"collections":16346571.75,"billings":18347721.91,"deposits":3216169.70,"over90_pct":0.063323,"over90_bal":2320708.79,"pct_coll":0.500420},{"month":"Mar-2023","gross_ar":28618845.91,"current":13836841.66,"days_30":7581520.32,"days_60":2807750.85,"days_90":1943423.37,"days_120":1168253.71,"days_360":1125687.91,"days_361":155368.09,"net_credits":-1083054.75,"net_ar":27535791.16,"collections":26836415.00,"billings":17978490.93,"deposits":1013093.00,"over90_pct":0.085584,"over90_bal":2449309.71,"pct_coll":0.732255},{"month":"Apr-2023","gross_ar":29646324.89,"current":13755047.92,"days_30":8090851.12,"days_60":3549080.45,"days_90":1752096.76,"days_120":1159174.10,"days_360":1316216.87,"days_361":23857.66,"net_credits":-1123641.37,"net_ar":28522683.52,"collections":13186192.00,"billings":15870501.61,"deposits":759054.00,"over90_pct":0.084302,"over90_bal":2499248.63,"pct_coll":0.460752},{"month":"May-2023","gross_ar":35226454.12,"current":18103591.45,"days_30":8826940.88,"days_60":3967128.43,"days_90":1715603.81,"days_120":815045.88,"days_360":1813346.43,"days_361":-15202.76,"net_credits":-1207604.42,"net_ar":34018849.70,"collections":15697266.80,"billings":20723847.11,"deposits":1156471.10,"over90_pct":0.074183,"over90_bal":2613189.55,"pct_coll":0.529484},{"month":"Jun-2023","gross_ar":30875378.71,"current":13968293.75,"days_30":8205914.17,"days_60":4026093.94,"days_90":2231359.78,"days_120":838897.04,"days_360":1533000.93,"days_361":71819.09,"net_credits":-894591.19,"net_ar":29980787.51,"collections":19782634.86,"billings":14901361.81,"deposits":3163478.50,"over90_pct":0.079148,"over90_bal":2443717.06,"pct_coll":0.561585},{"month":"Jul-2023","gross_ar":28633953.61,"current":12180217.20,"days_30":6645121.11,"days_60":3842744.92,"days_90":2676632.35,"days_120":1461028.79,"days_360":1713336.55,"days_361":114872.68,"net_credits":-910755.13,"net_ar":27723198.48,"collections":15459180.98,"billings":13246812.91,"deposits":1448889.55,"over90_pct":0.114872,"over90_bal":3289238.02,"pct_coll":0.500696},{"month":"Aug-2023","gross_ar":33733528.77,"current":17877486.48,"days_30":8218970.07,"days_60":2597842.78,"days_90":1728654.01,"days_120":1229863.06,"days_360":1883663.85,"days_361":197048.52,"net_credits":-848972.82,"net_ar":32884555.95,"collections":17634211.65,"billings":22178090.15,"deposits":1583441.88,"over90_pct":0.098139,"over90_bal":3310575.43,"pct_coll":0.615850},{"month":"Sep-2023","gross_ar":33858460.86,"current":16581939.87,"days_30":8249187.46,"days_60":3865143.38,"days_90":1562516.62,"days_120":1402869.18,"days_360":1973823.24,"days_361":222981.12,"net_credits":-936077.76,"net_ar":32922383.10,"collections":19271255.62,"billings":18651910.28,"deposits":1514195.47,"over90_pct":0.106315,"over90_bal":3599673.54,"pct_coll":0.571279},{"month":"Oct-2023","gross_ar":31874662.91,"current":13448596.63,"days_30":9003584.87,"days_60":4204001.98,"days_90":2054928.28,"days_120":1007853.40,"days_360":2028034.20,"days_361":127663.55,"net_credits":-908180.11,"net_ar":30966482.80,"collections":17442953.00,"billings":16331277.52,"deposits":1947119.40,"over90_pct":0.099250,"over90_bal":3163551.15,"pct_coll":0.515173},{"month":"Nov-2023","gross_ar":48081968.70,"current":23527795.36,"days_30":13543200.83,"days_60":4544419.90,"days_90":3089525.68,"days_120":1250553.40,"days_360":2047565.16,"days_361":78908.36,"net_credits":-610894.15,"net_ar":47471074.54,"collections":17664460.00,"billings":34149782.00,"deposits":1438491.00,"over90_pct":0.070235,"over90_bal":3377026.93,"pct_coll":0.554185},{"month":"Dec-2023","gross_ar":55375177.96,"current":28664842.45,"days_30":14557070.61,"days_60":6162118.50,"days_90":1869254.01,"days_120":2046257.04,"days_360":1934138.44,"days_361":141496.90,"net_credits":-859303.10,"net_ar":54515874.86,"collections":26511227.85,"billings":33537689.07,"deposits":1507133.78,"over90_pct":0.074436,"over90_bal":4121892.39,"pct_coll":0.551376},{"month":"Jan-2024","gross_ar":45023353.73,"current":17052707.65,"days_30":15049108.48,"days_60":5721271.81,"days_90":3044126.47,"days_120":1137051.52,"days_360":2857785.47,"days_361":161302.32,"net_credits":-1377884.31,"net_ar":43645469.42,"collections":26596498.34,"billings":15019997.80,"deposits":1534899.11,"over90_pct":0.092311,"over90_bal":4156139.31,"pct_coll":0.480296},{"month":"Feb-2024","gross_ar":47625267.82,"current":17284026.89,"days_30":12038770.32,"days_60":10292723.71,"days_90":3563942.11,"days_120":1858519.72,"days_360":2461784.54,"days_361":125500.53,"net_credits":-746064.87,"net_ar":46879202.95,"collections":17348653.98,"billings":20381207.94,"deposits":1125591.70,"over90_pct":0.093350,"over90_bal":4445804.79,"pct_coll":0.385326},{"month":"Mar-2024","gross_ar":35709788.93,"current":18502687.86,"days_30":8789973.61,"days_60":3837725.88,"days_90":1290231.93,"days_120":969904.71,"days_360":2135998.66,"days_361":183266.29,"net_credits":-792886.74,"net_ar":34916902.20,"collections":32194190.42,"billings":20418181.76,"deposits":1270291.45,"over90_pct":0.092108,"over90_bal":3289169.66,"pct_coll":0.675990},{"month":"Apr-2024","gross_ar":32279585.41,"current":14803028.94,"days_30":9153730.52,"days_60":3145803.19,"days_90":2129236.66,"days_120":705335.16,"days_360":2133785.60,"days_361":208665.36,"net_credits":-956396.03,"net_ar":31323189.38,"collections":20456300.56,"billings":15072952.10,"deposits":932435.85,"over90_pct":0.094418,"over90_bal":3047786.11,"pct_coll":0.572849},{"month":"May-2024","gross_ar":31858849.42,"current":15014197.88,"days_30":9125657.38,"days_60":3567254.33,"days_90":1499055.01,"days_120":798967.60,"days_360":1725042.94,"days_361":128674.28,"net_credits":-920242.18,"net_ar":30938607.24,"collections":20378362.11,"billings":20546819.95,"deposits":1693209.95,"over90_pct":0.083264,"over90_bal":2652684.82,"pct_coll":0.631308},{"month":"Jun-2024","gross_ar":34400224.66,"current":17532120.29,"days_30":8380968.61,"days_60":4058907.50,"days_90":1822778.93,"days_120":747152.14,"days_360":1831300.78,"days_361":26996.41,"net_credits":-707444.64,"net_ar":33692780.03,"collections":17124786.00,"billings":20124890.26,"deposits":930579.00,"over90_pct":0.075739,"over90_bal":2605449.33,"pct_coll":0.537521},{"month":"Jul-2024","gross_ar":30664226.16,"current":13932484.86,"days_30":8517376.38,"days_60":2980330.42,"days_90":1877011.60,"days_120":981799.28,"days_360":2197004.80,"days_361":178218.82,"net_credits":-641482.86,"net_ar":30022743.30,"collections":19511299.57,"billings":15218569.96,"deposits":1670482.00,"over90_pct":0.109477,"over90_bal":3357022.90,"pct_coll":0.567185},{"month":"Aug-2024","gross_ar":37593435.93,"current":21165083.43,"days_30":8440452.85,"days_60":2946684.71,"days_90":1745254.09,"days_120":1066284.32,"days_360":2049097.30,"days_361":180579.22,"net_credits":-688499.42,"net_ar":36904936.50,"collections":18172787.23,"billings":24074152.46,"deposits":1392346.71,"over90_pct":0.087674,"over90_bal":3295960.85,"pct_coll":0.592638},{"month":"Sep-2024","gross_ar":36841794.70,"current":17449468.40,"days_30":11577785.91,"days_60":3382885.60,"days_90":1484449.20,"days_120":1017682.23,"days_360":1883047.72,"days_361":46475.63,"net_credits":-822513.82,"net_ar":36019280.88,"collections":22457019.68,"billings":21951823.03,"deposits":2415005.51,"over90_pct":0.079996,"over90_bal":2947205.58,"pct_coll":0.597365},{"month":"Oct-2024","gross_ar":27974372.47,"current":12489598.97,"days_30":6726206.76,"days_60":3946249.31,"days_90":1926511.80,"days_120":945101.73,"days_360":1853174.17,"days_361":87529.73,"net_credits":-988336.45,"net_ar":26986036.02,"collections":22389666.00,"billings":12947687.65,"deposits":1189497.59,"over90_pct":0.103159,"over90_bal":2885805.63,"pct_coll":0.607725},{"month":"Nov-2024","gross_ar":64881109.57,"current":42080728.23,"days_30":15624029.42,"days_60":2578331.73,"days_90":2000927.08,"days_120":944825.70,"days_360":1554161.07,"days_361":98106.35,"net_credits":-599512.19,"net_ar":64281597.38,"collections":18082972.39,"billings":51722956.66,"deposits":986457.37,"over90_pct":0.040028,"over90_bal":2597093.11,"pct_coll":0.646412},{"month":"Dec-2024","gross_ar":54122921.09,"current":27567236.73,"days_30":16689378.69,"days_60":5822366.39,"days_90":1176746.03,"days_120":887470.22,"days_360":1869005.82,"days_361":110717.22,"net_credits":-641894.88,"net_ar":53481026.22,"collections":33506403.60,"billings":22819235.45,"deposits":1716626.27,"over90_pct":0.052976,"over90_bal":2867193.25,"pct_coll":0.516428},{"month":"Jan-2025","gross_ar":42224904.32,"current":19488986.48,"days_30":10431966.88,"days_60":6987955.24,"days_90":2542254.35,"days_120":804891.62,"days_360":1837544.43,"days_361":131305.31,"net_credits":-636672.90,"net_ar":41588231.42,"collections":30202174.17,"billings":17990821.12,"deposits":1187714.82,"over90_pct":0.065690,"over90_bal":2773741.36,"pct_coll":0.558029},{"month":"Feb-2025","gross_ar":43658826.57,"current":20030210.09,"days_30":12124623.97,"days_60":3750340.76,"days_90":4567180.75,"days_120":1606724.83,"days_360":1440364.20,"days_361":139381.97,"net_credits":-739223.50,"net_ar":42919603.07,"collections":21107713.91,"billings":22062277.60,"deposits":1634835.94,"over90_pct":0.072986,"over90_bal":3186471.00,"pct_coll":0.499888},{"month":"Mar-2025","gross_ar":37351774.11,"current":18452139.77,"days_30":9393275.27,"days_60":3994169.88,"days_90":1502732.02,"days_120":1863465.66,"days_360":2043099.56,"days_361":102891.95,"net_credits":-661108.13,"net_ar":36690665.99,"collections":26231895.00,"billings":20769144.52,"deposits":1175330.00,"over90_pct":0.107343,"over90_bal":4009457.17,"pct_coll":0.600838},{"month":"Apr-2025","gross_ar":44198818.14,"current":20457691.25,"days_30":11941127.48,"days_60":4802779.15,"days_90":2430355.52,"days_120":1316727.62,"days_360":3032557.78,"days_361":217579.34,"net_credits":-881873.18,"net_ar":43316944.96,"collections":19822764.90,"billings":27314150.74,"deposits":804794.34,"over90_pct":0.103325,"over90_bal":4566864.74,"pct_coll":0.530705},{"month":"May-2025","gross_ar":45187635.86,"current":21267230.25,"days_30":10591211.45,"days_60":6256736.94,"days_90":2394070.01,"days_120":1552945.35,"days_360":2989144.92,"days_361":136296.94,"net_credits":-736338.27,"net_ar":44451297.59,"collections":21707048.43,"billings":23760765.55,"deposits":1403873.36,"over90_pct":0.103532,"over90_bal":4678387.21,"pct_coll":0.491123},{"month":"Jun-2025","gross_ar":44865668.03,"current":21417558.27,"days_30":10703369.41,"days_60":4780990.87,"days_90":3566936.86,"days_120":1503451.78,"days_360":2861702.39,"days_361":31658.45,"net_credits":-729243.30,"net_ar":44136424.73,"collections":22977408.00,"billings":22437203.82,"deposits":1339454.95,"over90_pct":0.097999,"over90_bal":4396812.62,"pct_coll":0.508489},{"month":"Jul-2025","gross_ar":43645359.61,"current":20423302.90,"days_30":10578049.05,"days_60":4112391.00,"days_90":2665353.12,"days_120":2789877.14,"days_360":3075907.07,"days_361":479.32,"net_credits":-865225.19,"net_ar":42780134.42,"collections":23777705.02,"billings":23089332.84,"deposits":1973054.25,"over90_pct":0.134407,"over90_bal":5866263.54,"pct_coll":0.529976},{"month":"Aug-2025","gross_ar":52759737.83,"current":27322231.26,"days_30":13486495.49,"days_60":4507985.46,"days_90":2404284.48,"days_120":1449616.91,"days_360":3608152.62,"days_361":-19028.38,"net_credits":-907242.65,"net_ar":51852495.18,"collections":22942921.48,"billings":31715417.14,"deposits":1769547.12,"over90_pct":0.095504,"over90_bal":5038741.15,"pct_coll":0.525667},{"month":"Sep-2025","gross_ar":46570006.12,"current":21302514.63,"days_30":11939755.48,"days_60":6002608.95,"days_90":2622232.04,"days_120":1397362.79,"days_360":3413167.29,"days_361":-107635.06,"net_credits":-931833.72,"net_ar":45638172.40,"collections":26599554.00,"billings":21707500.28,"deposits":1374608.00,"over90_pct":0.100985,"over90_bal":4702895.02,"pct_coll":0.504164},{"month":"Oct-2025","gross_ar":46184573.29,"current":23687207.84,"days_30":10300194.14,"days_60":5079157.19,"days_90":2634380.50,"days_120":1346136.01,"days_360":3125560.49,"days_361":11937.12,"net_credits":-1033109.62,"net_ar":45151463.67,"collections":25375942.86,"billings":24885595.60,"deposits":1368300.45,"over90_pct":0.097081,"over90_bal":4483633.62,"pct_coll":0.544899},{"month":"Nov-2025","gross_ar":87002826.15,"current":54575528.81,"days_30":18666279.22,"days_60":5085658.23,"days_90":3712263.25,"days_120":1868127.19,"days_360":3072082.64,"days_361":22886.83,"net_credits":-786981.31,"net_ar":86215844.84,"collections":20370409.65,"billings":61429505.84,"deposits":1099349.08,"over90_pct":0.057045,"over90_bal":4963096.65,"pct_coll":0.441065},{"month":"Dec-2025","gross_ar":73267793.61,"current":32758427.39,"days_30":24840850.66,"days_60":7499186.65,"days_90":3186355.95,"days_120":2047042.43,"days_360":2860058.13,"days_361":75872.41,"net_credits":-905997.54,"net_ar":72361796.07,"collections":38970988.59,"billings":24911812.45,"deposits":1956418.16,"over90_pct":0.068010,"over90_bal":4982972.97,"pct_coll":0.447928},{"month":"Jan-2026","gross_ar":65477025.32,"current":25230186.00,"days_30":17335131.14,"days_60":13170236.48,"days_90":4157891.14,"days_120":2038441.76,"days_360":3422020.48,"days_361":123118.31,"net_credits":-876606.00,"net_ar":64600419.32,"collections":32073848.00,"billings":23304388.00,"deposits":1403614.15,"over90_pct":0.085275,"over90_bal":5583580.55,"pct_coll":0.437762},{"month":"Feb-2026","gross_ar":64331292.58,"current":26443708.80,"days_30":13863262.56,"days_60":9063624.26,"days_90":8437072.81,"days_120":2469009.21,"days_360":3897776.27,"days_361":156838.67,"net_credits":-934460.32,"net_ar":63396832.26,"collections":24740229.09,"billings":23415738.62,"deposits":2326157.70,"over90_pct":0.101407,"over90_bal":6523624.16,"pct_coll":0.377846}],"quarters":[{"quarter":"Q1 FY2023","collections":44.7478,"billings":41.9737,"ratio":1.066091},{"quarter":"Q2 FY2023","collections":44.1865,"billings":42.9345,"ratio":1.029160},{"quarter":"Q3 FY2023","collections":58.5907,"billings":70.5647,"ratio":0.830313},{"quarter":"Q4 FY2023","collections":60.5415,"billings":48.8465,"ratio":1.239424},{"quarter":"Q1 FY2024","collections":48.6661,"billings":51.4957,"ratio":0.945051},{"quarter":"Q2 FY2024","collections":52.3646,"billings":54.0768,"ratio":0.968338},{"quarter":"Q3 FY2024","collections":61.6186,"billings":84.0187,"ratio":0.733392},{"quarter":"Q4 FY2024","collections":76.1393,"billings":55.8194,"ratio":1.364030},{"quarter":"Q1 FY2025","collections":57.9594,"billings":55.7447,"ratio":1.039731},{"quarter":"Q2 FY2025","collections":60.1411,"billings":61.2445,"ratio":0.981983},{"quarter":"Q3 FY2025","collections":73.9790,"billings":87.4899,"ratio":0.845573},{"quarter":"Q4 FY2025","collections":77.5418,"billings":60.8222,"ratio":1.274892},{"quarter":"Q1 FY2026","collections":64.5072,"billings":73.5121,"ratio":0.877505},{"quarter":"Q2 FY2026","collections":73.3202,"billings":76.5123,"ratio":0.958280},{"quarter":"Q3 FY2026","collections":84.7173,"billings":111.2269,"ratio":0.761662},{"quarter":"Q4 FY2026","collections":56.8141,"billings":46.7201,"ratio":1.216051}],"pivot_years":["2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029","2030","2031","2032","2033","2034","2035"],"pivot_data":{"Jan":{"2019":32.5076,"2020":34.5269,"2021":34.5896,"2022":28.2320,"2023":32.6657,"2024":45.0234,"2025":42.2249,"2026":65.4770},"Feb":{"2019":29.0793,"2020":35.5798,"2021":35.2548,"2022":29.4371,"2023":36.6490,"2024":47.6253,"2025":43.6588,"2026":64.3313},"Mar":{"2018":21.1486,"2019":26.8738,"2020":38.7963,"2021":30.7193,"2022":27.1784,"2023":28.6188,"2024":35.7098,"2025":37.3518},"Apr":{"2018":17.2533,"2019":23.1095,"2020":36.1235,"2021":28.3315,"2022":26.5247,"2023":29.6463,"2024":32.2796,"2025":44.1988},"May":{"2018":18.3097,"2019":24.4256,"2020":38.9997,"2021":31.3113,"2022":25.7808,"2023":35.2265,"2024":31.8588,"2025":45.1876},"Jun":{"2018":20.9981,"2019":26.1696,"2020":35.6238,"2021":28.3867,"2022":26.2206,"2023":30.8754,"2024":34.4002,"2025":44.8657},"Jul":{"2018":19.2718,"2019":22.2913,"2020":28.2234,"2021":25.9871,"2022":24.0957,"2023":28.6340,"2024":30.6642,"2025":43.6454},"Aug":{"2018":18.5996,"2019":21.3438,"2020":27.4191,"2021":28.2540,"2022":27.5081,"2023":33.7335,"2024":37.5934,"2025":52.7597},"Sep":{"2018":19.8229,"2019":23.6201,"2020":24.9687,"2021":23.8535,"2022":25.2173,"2023":33.8585,"2024":36.8418,"2025":46.5700},"Oct":{"2018":31.5556,"2019":20.1913,"2020":22.1171,"2021":21.2728,"2022":28.2611,"2023":31.8747,"2024":27.9744,"2025":46.1846},"Nov":{"2018":27.5617,"2019":29.9270,"2020":21.7209,"2021":30.0312,"2022":43.0042,"2023":48.0820,"2024":64.8811,"2025":87.0028},"Dec":{"2018":32.9329,"2019":30.7149,"2020":36.9800,"2021":32.2992,"2022":37.8272,"2023":55.3752,"2024":54.1229,"2025":73.2678},"Annual Avg":{"2018":22.7454,"2019":25.8545,"2020":31.7566,"2021":29.1909,"2022":29.1073,"2023":35.4366,"2024":39.9146,"2025":50.5765,"2026":64.9042}}};
+
+const MONTHS = DATA.months;
+const QUARTS = DATA.quarters.filter(q=>q.collections>0||q.billings>0);
+const PIV_YRS = DATA.pivot_years.filter(y=>y!=='Avg'&&y!=='avg');
+const PIV = (function(){
+  var o={};
+  Object.keys(DATA.pivot_data).forEach(function(m){
+    o[m]={};
+    Object.keys(DATA.pivot_data[m]).forEach(function(y){
+      var v=+DATA.pivot_data[m][y];
+      if(v>0) o[m][y]=v;
+    });
+  });
+  return o;
+})();
+const MNAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const ABKTS=['Current','1-30 Days','31-60 Days','61-90 Days','91-120 Days','121-360 Days','361+ Days'];
+const AKEYS=['current','days_30','days_60','days_90','days_120','days_360','days_361'];
+const ACLRS=['#1B4FD8','#0891B2','#059669','#D97706','#DC2626','#7C3AED','#DB2777'];
+
+let CUR=MONTHS.length-1, agBkt=0, tMet=0;
+const CH={};
+
+// Formatters
+const fM=v=>'$'+(v/1e6).toFixed(2)+'M';
+const fM1=v=>(v/1e6).toFixed(2);
+const fP=v=>(v*100).toFixed(1)+'%';
+const fN=v=>Number(v).toLocaleString('en-US',{maximumFractionDigits:0});
+const fK=v=>(v/1e3).toFixed(1);
+const ml=v=>v.month;
+
+function dD(a,b,l='PM'){
+  if(!b) return '<span style="color:var(--t4)">--</span>';
+  const d=a-b,u=d>=0,s=u?'&#9650;':'&#9660;',c=u?'up':'down';
+  return `<span class="${c}">${s} ${(Math.abs(d)/1e6).toFixed(2)}M vs ${l}</span>`;
+}
+function dP(a,b,l='PM'){
+  if(b===undefined||b===null) return '<span style="color:var(--t4)">--</span>';
+  const d=a-b,u=d>=0,s=u?'&#9650;':'&#9660;',c=u?'up':'down';
+  return `<span class="${c}">${s} ${(Math.abs(d)*100).toFixed(1)}pp vs ${l}</span>`;
+}
+function yD(a,b){
+  if(!b) return '';
+  const p=(a-b)/b*100,u=p>=0,s=u?'&#9650;':'&#9660;',c=u?'up':'down';
+  return `<span class="${c}" style="font-size:8px">${s} ${Math.abs(p).toFixed(1)}% YoY</span>`;
+}
+function yP(a,b){
+  if(b===undefined||b===null) return '';
+  const d=(a-b)*100,u=d>=0,s=u?'&#9650;':'&#9660;',c=u?'up':'down';
+  return `<span class="${c}" style="font-size:8px">${s} ${Math.abs(d).toFixed(1)}pp YoY</span>`;
+}
+
+// Chart helpers
+const GC='rgba(27,79,216,.06)', TC='#94A3B8';
+const TF={size:9,family:"'Inter',sans-serif",weight:'600'};
+const TIP={backgroundColor:'rgba(255,255,255,.98)',titleColor:'#0E1726',bodyColor:'#2D3A4E',borderColor:'rgba(27,79,216,.15)',borderWidth:1,padding:9,cornerRadius:8,titleFont:{size:10,weight:'800',family:"'Inter Tight'"},bodyFont:{size:10,family:"'Inter'"}};
+function mk(id,cfg){const e=document.getElementById(id);if(!e)return;if(CH[id])CH[id].destroy();CH[id]=new Chart(e.getContext('2d'),cfg);}
+function bO(o={}){return dm({responsive:true,plugins:{legend:{display:false},tooltip:TIP},scales:{y:{grid:{color:GC},ticks:{font:TF,color:TC},border:{color:'transparent'}},x:{grid:{display:false},ticks:{font:TF,color:TC,maxRotation:45},border:{color:GC}}}},o);}
+function dm(t,s){for(const k of Object.keys(s)){if(s[k]&&typeof s[k]==='object'&&!Array.isArray(s[k])){t[k]=t[k]||{};dm(t[k],s[k]);}else t[k]=s[k];}return t;}
+
+// Nav
+const META={
+  overview:{title:'Financial Overview',sub:'Accounts Receivable KPI Snapshot &amp; Trailing Performance'},
+  aging:{title:'Aging Detail',sub:'Bucket breakdown & historical trend analysis'},
+  trends:{title:'Metric Trends',sub:'Full historical view across all key AR indicators'},
+  quarterly:{title:'Quarterly Performance',sub:'FY2023 onwards &middot; Collections vs Billings'},
+  pivot:{title:'Year-over-Year Pivot',sub:'Gross AR heat map &middot; monthly comparison across years'},
+  history:{title:'Full History',sub:'All '+MONTHS.length+' months of AR data'},
+};
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const pg=el.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('page-'+pg).classList.add('active');
+    const m=META[pg]||{};
+    document.getElementById('pt').textContent=m.title||'';
+    document.getElementById('ps').textContent=m.sub||'';
+    renderPage(pg);
+  });
+});
+
+function initPicker(){
+  const sel=document.getElementById('mp');
+  MONTHS.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.month;sel.appendChild(o);});
+  sel.value=CUR;
+  sel.addEventListener('change',e=>{CUR=+e.target.value;renderAll();});
+}
+function upHdr(){
+  const lbl=MONTHS[CUR].month;
+  ['sp','pp'].forEach(id=>document.getElementById(id).textContent=lbl);
+  document.getElementById('gn').textContent='Generated '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' &middot; Confidential';
+}
+
+// OVERVIEW
+function renderOverview(){
+  const m=MONTHS[CUR],pm=CUR>0?MONTHS[CUR-1]:null,py=CUR>=12?MONTHS[CUR-12]:null;
+  document.getElementById('aml').textContent=m.month;
+  const KPIS=[
+    {l:'Gross AR',v:fM(m.gross_ar),mm:dD(m.gross_ar,pm?.gross_ar),yy:yD(m.gross_ar,py?.gross_ar),k:'k1'},
+    {l:'Net AR',v:fM(m.net_ar),mm:dD(m.net_ar,pm?.net_ar),yy:yD(m.net_ar,py?.net_ar),k:'k2'},
+    {l:'Collections',v:fM(m.collections),mm:dD(m.collections,pm?.collections),yy:yD(m.collections,py?.collections),k:'k3'},
+    {l:'Billings',v:fM(m.billings),mm:dD(m.billings,pm?.billings),yy:yD(m.billings,py?.billings),k:'k4'},
+    {l:'Over 90+ Mix',v:fP(m.over90_pct),mm:dP(m.over90_pct,pm?.over90_pct),yy:yP(m.over90_pct,py?.over90_pct),k:'k5'},
+    {l:'% Coll PM AR',v:fP(m.pct_coll),mm:dP(m.pct_coll,pm?.pct_coll),yy:yP(m.pct_coll,py?.pct_coll),k:'k6'},
+  ];
+  document.getElementById('ks').innerHTML=KPIS.map(k=>`
+    <div class="kpi ${k.k}">
+      <div class="kl">${k.l}</div>
+      <div class="kv">${k.v}</div>
+      <div class="kd">
+        <div class="krow"><span class="badge">&#916;M</span> ${k.mm}</div>
+        <div class="krow"><span class="badge">&#916;Y</span> ${k.yy||'--'}</div>
+      </div>
+    </div>`).join('');
+  const t12=MONTHS.slice(Math.max(0,CUR-11),CUR+1);
+  mk('ovT',{type:'bar',data:{labels:t12.map(ml),datasets:[{label:'Gross AR',data:t12.map(x=>x.gross_ar/1e6),backgroundColor:t12.map((_,i)=>i===t12.length-1?'rgba(27,79,216,1)':'rgba(27,79,216,.18)'),hoverBackgroundColor:t12.map((_,i)=>i===t12.length-1?'rgba(27,79,216,1)':'rgba(27,79,216,.35)'),borderRadius:6,borderSkipped:false}]},options:bO({plugins:{tooltip:{...TIP,callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'M'}}},scales:{y:{ticks:{callback:v=>'$'+v+'M'}}}})});
+  mk('ovD',{type:'doughnut',data:{labels:ABKTS,datasets:[{data:AKEYS.map(k=>Math.max(0,m[k])),backgroundColor:ACLRS,borderWidth:3,borderColor:'var(--card)',hoverOffset:6}]},options:{responsive:true,cutout:'64%',plugins:{legend:{position:'bottom',labels:{font:{size:8.5,family:"'Inter'",weight:'600'},color:TC,boxWidth:7,padding:8}},tooltip:{...TIP,callbacks:{label:c=>c.label+': $'+(c.raw/1e6).toFixed(1)+'M ('+((c.raw/m.gross_ar)*100).toFixed(1)+'%)'}}}}});
+  const hdr=`<tr><th>Month</th><th>Gross AR ($M)</th><th>Net AR ($M)</th><th>Collections ($M)</th><th>Billings ($M)</th><th>90+ Mix</th><th>% Coll PM</th><th>Deposits ($K)</th><th>Net Credits ($K)</th></tr>`;
+  const rows=t12.map(x=>`<tr class="${x===m?'hl':''}">
+    <td><b>${x.month}</b></td><td>${fM1(x.gross_ar)}</td><td>${fM1(x.net_ar)}</td>
+    <td>${fM1(x.collections)}</td><td>${fM1(x.billings)}</td>
+    <td style="color:${x.over90_pct>0.15?'var(--dn)':x.over90_pct>0.1?'var(--warn)':'var(--up)'};font-weight:800">${fP(x.over90_pct)}</td>
+    <td style="color:${x.pct_coll>=1?'var(--up)':'var(--t3)'};font-weight:800">${fP(x.pct_coll)}</td>
+    <td>${fK(x.deposits)}</td><td>${fK(Math.abs(x.net_credits))}</td>
+  </tr>`).join('');
+  document.getElementById('ovTbl').innerHTML=hdr+rows;
+}
+
+// AGING
+function renderAging(){
+  const m=MONTHS[CUR];
+  document.getElementById('agml').textContent=m.month;
+  mk('agD',{type:'doughnut',data:{labels:ABKTS,datasets:[{data:AKEYS.map(k=>Math.max(0,m[k])),backgroundColor:ACLRS,borderWidth:3,borderColor:'var(--card)',hoverOffset:8}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{size:8.5,family:"'Inter'",weight:'600'},color:TC,boxWidth:7}},tooltip:{...TIP,callbacks:{label:c=>c.label+': $'+(c.raw/1e6).toFixed(1)+'M ('+((c.raw/m.gross_ar)*100).toFixed(1)+'%)'}}}}});
+  const rows=ABKTS.map((l,i)=>{const v=m[AKEYS[i]],p=m.gross_ar?v/m.gross_ar:0;
+    return `<tr><td><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${ACLRS[i]};margin-right:6px;vertical-align:middle"></span>${l}</td>
+      <td>${fN(v)}</td><td>${fP(p)}</td>
+      <td style="width:70px"><div class="abar"><div class="afill" style="width:${Math.max(1,Math.round(p*100))}%;background:${ACLRS[i]}"></div></div></td></tr>`;}).join('');
+  document.getElementById('agDtl').innerHTML=`<tr><th>Bucket</th><th>Amount ($)</th><th>% AR</th><th>Mix</th></tr>${rows}<tr class="hl"><td>Gross AR Total</td><td>${fN(m.gross_ar)}</td><td>100%</td><td></td></tr>`;
+  document.getElementById('agBtns').innerHTML=ABKTS.map((l,i)=>`<button class="pill${i===agBkt?' active':''}" onclick="setAgBkt(${i})">${l}</button>`).join('');
+  document.getElementById('agbl').textContent=ABKTS[agBkt];
+  const t24=MONTHS.slice(Math.max(0,CUR-23),CUR+1);
+  mk('agTr',{type:'line',data:{labels:t24.map(ml),datasets:[{data:t24.map(x=>x[AKEYS[agBkt]]/1e6),borderColor:ACLRS[agBkt],backgroundColor:ACLRS[agBkt]+'20',fill:true,tension:.4,pointRadius:2,pointHoverRadius:5,borderWidth:2.5}]},options:bO({plugins:{tooltip:{...TIP,callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'M'}}},scales:{y:{ticks:{callback:v=>'$'+v+'M'}}}})});
+  const t13=MONTHS.slice(Math.max(0,CUR-12),CUR+1);
+  const hdrs=t13.map(x=>`<th>${ml(x)}</th>`).join('');
+  const tR=ABKTS.map((l,i)=>{const k=AKEYS[i];
+    return `<tr><td><span style="width:6px;height:6px;border-radius:50%;background:${ACLRS[i]};display:inline-block;margin-right:5px;vertical-align:middle"></span>${l}</td>${t13.map(x=>`<td>${(x[k]/1e6).toFixed(2)}</td>`).join('')}</tr>`;}).join('');
+  const tots=t13.map(x=>`<td>${(x.gross_ar/1e6).toFixed(2)}</td>`).join('');
+  document.getElementById('agFull').innerHTML=`<tr><th>Bucket ($M)</th>${hdrs}</tr>${tR}<tr class="hl"><td>Gross AR</td>${tots}</tr>`;
+}
+function setAgBkt(i){agBkt=i;document.getElementById('agbl').textContent=ABKTS[i];renderAging();}
+
+// TRENDS
+const TMETS=[
+  {key:'gross_ar',lbl:'Gross AR',clr:'#1B4FD8',fmt:v=>v/1e6,sfx:'M',yl:v=>'$'+v+'M'},
+  {key:'net_ar',lbl:'Net AR',clr:'#0891B2',fmt:v=>v/1e6,sfx:'M',yl:v=>'$'+v+'M'},
+  {key:'collections',lbl:'Collections',clr:'#059669',fmt:v=>v/1e6,sfx:'M',yl:v=>'$'+v+'M'},
+  {key:'billings',lbl:'Billings',clr:'#D97706',fmt:v=>v/1e6,sfx:'M',yl:v=>'$'+v+'M'},
+  {key:'over90_pct',lbl:'Over 90+%',clr:'#DC2626',fmt:v=>v*100,sfx:'%',yl:v=>v+'%'},
+  {key:'pct_coll',lbl:'% Coll PM',clr:'#7C3AED',fmt:v=>v*100,sfx:'%',yl:v=>v+'%'},
+  {key:'over90_bal',lbl:'90+ Balance',clr:'#DB2777',fmt:v=>v/1e6,sfx:'M',yl:v=>'$'+v+'M'},
+];
+function renderTrends(){
+  document.getElementById('tBtns').innerHTML=TMETS.map((m,i)=>`<button class="pill${i===tMet?' active':''}" onclick="setTMet(${i})">${m.lbl}</button>`).join('');
+  const tm=TMETS[tMet];
+  document.getElementById('tT').textContent=tm.lbl+' -- All '+MONTHS.length+' Months';
+  mk('tMain',{type:'line',data:{labels:MONTHS.map(ml),datasets:[{data:MONTHS.map(x=>tm.fmt(x[tm.key])),borderColor:tm.clr,backgroundColor:tm.clr+'18',fill:true,tension:.35,pointRadius:0,pointHoverRadius:5,borderWidth:2.5}]},options:bO({plugins:{tooltip:{...TIP,callbacks:{label:c=>c.parsed.y.toFixed(2)+tm.sfx}}},scales:{y:{ticks:{callback:tm.yl}},x:{ticks:{maxTicksLimit:20}}}})});
+  const t24=MONTHS.slice(Math.max(0,CUR-23),CUR+1);
+  mk('tCB',{type:'bar',data:{labels:t24.map(ml),datasets:[{label:'Collections',data:t24.map(x=>x.collections/1e6),backgroundColor:'rgba(5,150,105,.65)',borderRadius:5},{label:'Billings',data:t24.map(x=>x.billings/1e6),backgroundColor:'rgba(217,119,6,.55)',borderRadius:5}]},options:bO({plugins:{legend:{display:true,labels:{font:{size:8.5,family:"'Inter'",weight:'600'},color:TC,boxWidth:7}},tooltip:{...TIP,callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'M'}}},scales:{y:{ticks:{callback:v=>'$'+v+'M'}}}})});
+  mk('tO9',{type:'line',data:{labels:t24.map(ml),datasets:[{data:t24.map(x=>x.over90_pct*100),borderColor:'#DC2626',backgroundColor:'rgba(220,38,38,.08)',fill:true,tension:.35,pointRadius:2,borderWidth:2.5}]},options:bO({plugins:{tooltip:{...TIP,callbacks:{label:c=>c.parsed.y.toFixed(1)+'%'}}},scales:{y:{ticks:{callback:v=>v.toFixed(0)+'%'}}}})});
+  mk('tPC',{type:'bar',data:{labels:t24.map(ml),datasets:[{data:t24.map(x=>x.pct_coll*100),backgroundColor:t24.map(x=>x.pct_coll>=1?'rgba(5,150,105,.7)':'rgba(27,79,216,.4)'),borderRadius:5}]},options:bO({plugins:{tooltip:{...TIP,callbacks:{label:c=>c.parsed.y.toFixed(1)+'%'}}},scales:{y:{ticks:{callback:v=>v.toFixed(0)+'%'}}}})});
+  mk('tNG',{type:'line',data:{labels:t24.map(ml),datasets:[{label:'Gross AR',data:t24.map(x=>x.gross_ar/1e6),borderColor:'#1B4FD8',backgroundColor:'transparent',tension:.35,pointRadius:0,borderWidth:2.5},{label:'Net AR',data:t24.map(x=>x.net_ar/1e6),borderColor:'#0891B2',backgroundColor:'transparent',tension:.35,pointRadius:0,borderWidth:2.5}]},options:bO({plugins:{legend:{display:true,labels:{font:{size:8.5,family:"'Inter'",weight:'600'},color:TC,boxWidth:7}},tooltip:{...TIP,callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'M'}}},scales:{y:{ticks:{callback:v=>'$'+v+'M'}}}})});
+}
+function setTMet(i){tMet=i;renderTrends();}
+
+// QUARTERLY
+function renderQuarterly(){
+  mk('qCB',{type:'bar',data:{labels:QUARTS.map(q=>q.quarter),datasets:[{label:'Collections',data:QUARTS.map(q=>q.collections),backgroundColor:'rgba(5,150,105,.65)',borderRadius:5},{label:'Billings',data:QUARTS.map(q=>q.billings),backgroundColor:'rgba(217,119,6,.55)',borderRadius:5}]},options:bO({plugins:{legend:{display:true,labels:{font:{size:8.5,family:"'Inter'",weight:'600'},color:TC,boxWidth:7}},tooltip:{...TIP,callbacks:{label:c=>'$'+c.parsed.y.toFixed(1)+'M'}}},scales:{y:{ticks:{callback:v=>'$'+v+'M'}}}})});
+  mk('qR',{type:'line',data:{labels:QUARTS.map(q=>q.quarter),datasets:[{label:'Ratio',data:QUARTS.map(q=>q.ratio*100),borderColor:'#1B4FD8',backgroundColor:'rgba(27,79,216,.07)',fill:true,tension:.35,pointRadius:5,pointBackgroundColor:QUARTS.map(q=>q.ratio>=1?'#059669':'#DC2626'),borderWidth:2.5},{label:'Target (100%)',data:QUARTS.map(()=>100),borderColor:'rgba(220,38,38,.35)',borderDash:[5,4],borderWidth:1.5,pointRadius:0}]},options:bO({plugins:{legend:{display:true,labels:{font:{size:8.5,family:"'Inter'",weight:'600'},color:TC,boxWidth:7}},tooltip:{...TIP,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{y:{ticks:{callback:v=>v+'%'}}}})});
+  const rows=QUARTS.map(q=>{const ok=q.ratio>=1,net=q.collections-q.billings;
+    return `<tr><td><b>${q.quarter}</b></td><td>$${q.collections.toFixed(2)}M</td><td>$${q.billings.toFixed(2)}M</td>
+      <td style="color:${ok?'var(--up)':'var(--dn)'};font-weight:800">${(q.ratio*100).toFixed(1)}%</td>
+      <td style="color:${net>=0?'var(--up)':'var(--dn)'};font-weight:800">$${net.toFixed(2)}M</td></tr>`;}).join('');
+  document.getElementById('qTbl').innerHTML=`<tr><th>Quarter</th><th>Collections ($M)</th><th>Billings ($M)</th><th>Ratio</th><th>Net</th></tr>${rows}`;
+}
+
+// PIVOT
+function renderPivot(){
+  const vy=PIV_YRS.filter(y=>MNAMES.some(m=>PIV[m]?.[y]));
+  const av=[];MNAMES.forEach(m=>vy.forEach(y=>{const v=PIV[m]?.[y];if(v)av.push(v);}));
+  const mn=Math.min(...av),mx=Math.max(...av);
+  const hc=v=>v?'h'+Math.min(7,Math.floor(((v-mn)/(mx-mn))*8)):'';
+  const hdrs=vy.map(y=>`<th>${y}</th>`).join('');
+  const pR=MNAMES.map(m=>{
+    const cells=vy.map(y=>{const v=PIV[m]?.[y];return v?`<td class="${hc(v)}" title="${m}-${y}: $${v.toFixed(2)}M">${v.toFixed(1)}</td>`:`<td style="color:var(--t4)">--</td>`;}).join('');
+    const vals=vy.map(y=>PIV[m]?.[y]).filter(Boolean);
+    const avg=vals.length?(vals.reduce((a,b)=>a+b)/vals.length).toFixed(1):'--';
+    return `<tr><td><b>${m}</b></td>${cells}<td style="background:var(--p5);color:var(--p1);font-weight:800">${avg}</td></tr>`;}).join('');
+  const aavg=vy.map(y=>{const v=MNAMES.map(m=>PIV[m]?.[y]).filter(Boolean);return v.length?`<td style="background:var(--p4);color:var(--p1);font-weight:800">${(v.reduce((a,b)=>a+b)/v.length).toFixed(1)}</td>`:`<td>--</td>`;}).join('');
+  document.getElementById('pivT').innerHTML=`<tr><th>Month</th>${hdrs}<th>Avg</th></tr>${pR}<tr><td style="color:var(--p1);font-weight:800">Annual Avg</td>${aavg}<td>--</td></tr>`;
+  const rc=vy.slice(-7);
+  const LC=['#1B4FD8','#059669','#D97706','#DC2626','#0891B2','#7C3AED','#DB2777'];
+  mk('yoyL',{type:'line',data:{labels:MNAMES,datasets:rc.map((y,i)=>{const v=MNAMES.map(m=>PIV[m]?.[y]||null);return {label:y,data:v,borderColor:LC[i],backgroundColor:'transparent',tension:.35,pointRadius:3,spanGaps:true,borderWidth:2};})},options:bO({plugins:{legend:{display:true,labels:{font:{size:8.5,family:"'Inter'",weight:'600'},color:TC,boxWidth:7}},tooltip:{...TIP,callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y?.toFixed(2)+'M'}}},scales:{y:{ticks:{callback:v=>'$'+v+'M'}}}})});
+}
+
+// HISTORY
+function renderHistory(filter=''){
+  const fl=filter?MONTHS.filter(m=>m.month.toLowerCase().includes(filter.toLowerCase())):MONTHS;
+  document.getElementById('hcount').textContent=fl.length+' months';
+  const rows=[...fl].reverse().map(m=>{
+    const oc=m.over90_pct>0.15?'var(--dn)':m.over90_pct>0.1?'var(--warn)':'var(--up)';
+    const pc=m.pct_coll>=1?'var(--up)':'var(--t3)';
+    return `<tr><td><b>${m.month}</b></td><td>${fM1(m.gross_ar)}</td><td>${fM1(m.net_ar)}</td>
+      <td>${fM1(m.collections)}</td><td>${fM1(m.billings)}</td>
+      <td style="color:${oc};font-weight:800">${fP(m.over90_pct)}</td>
+      <td style="color:${pc};font-weight:800">${fP(m.pct_coll)}</td>
+      <td>${fK(m.deposits)}</td><td>${fK(Math.abs(m.net_credits))}</td><td>${fN(m.over90_bal)}</td></tr>`;}).join('');
+  document.getElementById('hTbl').innerHTML=`<tr><th>Month</th><th>Gross AR ($M)</th><th>Net AR ($M)</th><th>Collections ($M)</th><th>Billings ($M)</th><th>Over 90+ Mix</th><th>% Collected of PM AR</th><th>Deposits ($K)</th><th>Net Credits ($K)</th><th>Over 90 Balance ($)</th></tr>${rows}`;
+}
+
+function renderPage(pg){
+  upHdr();
+  if(pg==='overview') renderOverview();
+  if(pg==='aging')    renderAging();
+  if(pg==='trends')   renderTrends();
+  if(pg==='quarterly')renderQuarterly();
+  if(pg==='pivot')    renderPivot();
+  if(pg==='history')  renderHistory();
+}
+function renderAll(){
+  upHdr();renderOverview();renderAging();renderTrends();renderQuarterly();renderPivot();renderHistory();
+}
+
+function toggleTheme(){
+  const h=document.documentElement;
+  const dark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('iconMoon').style.display=dark?'block':'none';
+  document.getElementById('iconSun').style.display=dark?'none':'block';
+  try{localStorage.setItem('arTheme',dark?'light':'dark');}catch(e){}
+}
+function initTheme(){
+  let t='light';try{t=localStorage.getItem('arTheme')||'light';}catch(e){}
+  document.documentElement.setAttribute('data-theme',t);
+  const isDark=t==='dark';
+  document.getElementById('iconMoon').style.display=isDark?'none':'block';
+  document.getElementById('iconSun').style.display=isDark?'block':'none';
+}
+
+initTheme();
+initPicker();
+renderAll();
+document.getElementById('hs').addEventListener('input',e=>renderHistory(e.target.value));
+</script>
+</body>
+</html>

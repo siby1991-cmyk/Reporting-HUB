@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Reporting HUB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-size: 14px;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #0a0f1a 0%, #0d1f0a 40%, #0f1a2e 70%, #1a0d2e 100%);
+    }
+
+    /* Ambient blobs */
+    .blob {
+      position: fixed; border-radius: 50%; filter: blur(80px);
+      pointer-events: none; animation: blobFloat 8s ease-in-out infinite;
+    }
+    .blob-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(168,230,61,0.14), transparent 70%); top: -150px; left: -100px; animation-delay: 0s; }
+    .blob-2 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(99,60,220,0.16), transparent 70%); bottom: -200px; right: -150px; animation-delay: -3s; }
+    .blob-3 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(59,130,246,0.12), transparent 70%); top: 30%; right: 10%; animation-delay: -5s; }
+    @keyframes blobFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-28px); } }
+
+    /* Overlay gradient */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 45% at 10% 15%, rgba(168,230,61,0.16) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 55% at 90% 85%, rgba(99,60,220,0.20) 0%, transparent 55%);
+    }
+
+    /* Card */
+    .card {
+      position: relative; z-index: 1;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 48px 52px;
+      width: 420px; max-width: 95vw;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.08) inset;
+      display: flex; flex-direction: column; gap: 24px;
+      animation: cardIn .5s cubic-bezier(0.22,1,0.36,1);
+    }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+    /* Accent line */
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(168,230,61,0.7), transparent);
+      border-radius: 999px;
+    }
+
+    /* Logo */
+    .logo-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .logo-wrap img {
+      height: 52px; width: auto; object-fit: contain;
+      mix-blend-mode: screen;
+    }
+    .admin-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(168,230,61,0.12);
+      border: 1px solid rgba(168,230,61,0.25);
+      border-radius: 999px; padding: 4px 14px;
+      font-size: 12px; font-weight: 700;
+      color: #aaeb3d; letter-spacing: 0.05em;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.45);
+      font-size: 13px; text-align: center; margin-top: -10px;
+    }
+
+    /* Form */
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label {
+      font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+    .field input {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px; padding: 13px 16px;
+      color: #fff; font-size: 15px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      outline: none; width: 100%;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+      letter-spacing: 0.2em;
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.2); letter-spacing: 0; }
+    .field input:focus {
+      border-color: rgba(168,230,61,0.6);
+      box-shadow: 0 0 0 3px rgba(168,230,61,0.12);
+      background: rgba(255,255,255,0.10);
+    }
+
+    .error { color: #ff6b6b; font-size: 12px; min-height: 16px; text-align: center; }
+
+    .btn {
+      background: linear-gradient(135deg, #aaeb3d 0%, #7ec918 100%);
+      color: #1a2e00; font-weight: 800;
+      border: none; border-radius: 12px;
+      padding: 14px; font-size: 15px; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-shadow: 0 4px 20px rgba(168,230,61,0.3);
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+      width: 100%;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(168,230,61,0.45); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.6; cursor: default; }
+
+    .back-link {
+      text-align: center;
+      font-size: 12px; color: rgba(255,255,255,0.3);
+    }
+    .back-link a {
+      color: rgba(168,230,61,0.7); text-decoration: none;
+      transition: color .15s;
+    }
+    .back-link a:hover { color: #aaeb3d; }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="card">
+    <div class="logo-wrap">
+      <img src="/images/logo-dark.png" alt="Agilysys" />
+      <span class="admin-badge">👑 Admin Access</span>
+    </div>
+
+    <p class="subtitle">Enter your admin PIN to continue</p>
+
+    <div class="field">
+      <label>Admin PIN</label>
+      <input type="password" id="pin-input" placeholder="••••" maxlength="20" autocomplete="off" autofocus />
+    </div>
+
+    <div class="error" id="error-msg"></div>
+
+    <button class="btn" id="login-btn">Enter Admin →</button>
+
+  </div>
+
+  <script>
+    const pinInput = document.getElementById('pin-input');
+    const loginBtn = document.getElementById('login-btn');
+    const errorMsg = document.getElementById('error-msg');
+
+    async function attemptLogin() {
+      const pin = pinInput.value.trim();
+      if (!pin) { errorMsg.textContent = 'Enter your PIN.'; return; }
+
+      loginBtn.textContent = '…';
+      loginBtn.disabled = true;
+      errorMsg.textContent = '';
+
+      try {
+        const res = await fetch('/api/config', { headers: { 'X-Admin-PIN': pin } });
+        if (res.ok) {
+          // Set admin session then go to main app
+          sessionStorage.setItem('rh_role_type', 'admin');
+          sessionStorage.setItem('rh_role_name', 'Admin');
+          sessionStorage.setItem('rh_pin', pin);
+          window.location.href = '/';
+        } else {
+          errorMsg.textContent = 'Incorrect PIN. Try again.';
+          pinInput.value = '';
+          pinInput.focus();
+        }
+      } catch {
+        errorMsg.textContent = 'Connection error. Is the server running?';
+      } finally {
+        loginBtn.textContent = 'Enter Admin →';
+        loginBtn.disabled = false;
+      }
+    }
+
+    loginBtn.addEventListener('click', attemptLogin);
+    pinInput.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+  </script>
+</body>
+</html>

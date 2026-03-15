@@ -1,0 +1,176 @@
+{
+  "departments": [
+    {
+      "id": "operations",
+      "name": "Operations",
+      "icon": "⚙️",
+      "order": 2,
+      "createdAt": "2026-03-14T00:00:00.000Z",
+      "description": "Operational metrics, KPIs, and performance tracking.",
+      "color": "#ff7040"
+    },
+    {
+      "id": "accounts-receivables",
+      "name": "Accounts Receivables",
+      "icon": "💰",
+      "order": 0,
+      "createdAt": "2026-03-14T00:00:00.000Z",
+      "description": "AR aging, DSO trends, collections workflow & cash flow forecasting.",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "finance",
+      "name": "Finance",
+      "icon": "📊",
+      "order": 1,
+      "createdAt": "2026-03-14T00:00:00.000Z",
+      "description": "Financial statements, budgets, forecasts and P&L analysis.",
+      "color": "#8b6fff"
+    },
+    {
+      "id": "hr",
+      "name": "HR",
+      "icon": "👥",
+      "order": 3,
+      "createdAt": "2026-03-14T00:00:00.000Z",
+      "description": "Headcount, attrition, hiring pipeline and employee engagement.",
+      "color": "#ff4d8f"
+    },
+    {
+      "id": "sales",
+      "name": "Sales",
+      "icon": "📈",
+      "order": 4,
+      "createdAt": "2026-03-14T00:00:00.000Z",
+      "description": "Pipeline, revenue, quota attainment and sales performance.",
+      "color": "#00e5a0"
+    },
+    {
+      "id": "accounts-payable",
+      "name": "Accounts Payable",
+      "icon": "📁",
+      "description": "",
+      "color": "#0284c7",
+      "order": 5,
+      "createdAt": "2026-03-15T05:06:47.566Z"
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "f2199844-e765-4671-afd0-bccec193fa73",
+      "departmentId": "accounts-receivables",
+      "name": "The Agilysys AR Trend Dashboard",
+      "description": "",
+      "type": "file",
+      "uploadedAt": "2026-03-14T16:55:03.454Z",
+      "filename": "f014e2e5-cbc1-4fd1-baf1-358104f6234c-AR_CFO_Dashboard__1_.html",
+      "accessLevel": "all"
+    },
+    {
+      "id": "36e46970-cae3-428b-b5b5-f330c4653d1a",
+      "departmentId": "accounts-receivables",
+      "name": "Aging",
+      "description": "",
+      "type": "url",
+      "uploadedAt": "2026-03-14T16:57:09.326Z",
+      "url": "https://app.powerbi.com/groups/me/reports/39b89706-6d78-447a-92c2-8f1b0e474ba2/b044dbc0bbd14737c580?ctid=9750a820-9364-4bc3-9990-123c1645274b&experience=power-bi",
+      "accessLevel": "all"
+    }
+  ],
+  "config": {
+    "appName": "Reporting HUB",
+    "adminPin": "1234",
+    "activeUsers": 38,
+    "uptimePercent": 99
+  },
+  "activity": [
+    {
+      "id": "29d698d7-435d-4ba6-820e-6143381512f1",
+      "action": "dept_created",
+      "label": "Department \"Accounts Payable\" created",
+      "department": "Accounts Payable",
+      "user": "Admin",
+      "timestamp": "2026-03-15T05:06:47.566Z"
+    },
+    {
+      "id": "67b2c768-3356-4ada-a3ac-b4af9c7cbbfe",
+      "action": "dashboard_updated",
+      "label": "\"Aging\" updated",
+      "department": "",
+      "user": "Admin",
+      "timestamp": "2026-03-15T01:56:24.417Z"
+    },
+    {
+      "id": "6d6482cb-75a2-4a19-ad28-c72dc3d31150",
+      "action": "dashboard_deleted",
+      "label": "\"AR Dashboard\" deleted",
+      "department": "",
+      "user": "Admin",
+      "timestamp": "2026-03-15T01:55:56.126Z"
+    },
+    {
+      "id": "7f45dab1-aae5-4d5b-8b87-1bd55cd26f0d",
+      "action": "dashboard_added",
+      "label": "\"AR Dashboard\" added to Operations",
+      "department": "Operations",
+      "user": "Admin",
+      "timestamp": "2026-03-15T01:55:32.685Z"
+    }
+  ],
+  "roles": [
+    {
+      "name": "HR Team",
+      "pin": "5678",
+      "allowedDepartments": [
+        "hr"
+      ],
+      "id": "5f16b1a9-3bbd-4b46-b528-a1e332a0e9c9",
+      "createdAt": "2026-03-15T04:40:18.804Z"
+    },
+    {
+      "name": "Finance Viewers",
+      "pin": "9012",
+      "allowedDepartments": [
+        "finance"
+      ],
+      "id": "608707c5-f7b4-44db-8d25-5d5f1d7b64d8",
+      "createdAt": "2026-03-15T04:40:18.804Z"
+    },
+    {
+      "name": "Sales Team",
+      "pin": "3456",
+      "allowedDepartments": [
+        "sales"
+      ],
+      "id": "d2cdedf4-76e4-4a47-91d7-3929b9585bf7",
+      "createdAt": "2026-03-15T04:40:18.804Z"
+    },
+    {
+      "name": "Operations Team",
+      "pin": "7890",
+      "allowedDepartments": [
+        "operations"
+      ],
+      "id": "8eaf0568-d37f-4f4c-94a8-4fa3636d7b11",
+      "createdAt": "2026-03-15T04:40:18.804Z"
+    },
+    {
+      "id": "b4e816ab-c32d-4e6a-adbd-0251f0383665",
+      "name": "Accounts Receivables",
+      "pin": "0000",
+      "allowedDepartments": [
+        "accounts-receivables"
+      ],
+      "createdAt": "2026-03-15T07:06:57.581Z"
+    },
+    {
+      "id": "aa83039a-7f09-4654-bbcf-fe5de8ad144d",
+      "name": "Accounts Payable",
+      "pin": "0000",
+      "allowedDepartments": [
+        "accounts-payable"
+      ],
+      "createdAt": "2026-03-15T07:06:57.581Z"
+    }
+  ]
+}

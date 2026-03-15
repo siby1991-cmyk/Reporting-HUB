@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reporting HUB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- Dark-mode ambient orbs -->
+  <div id="orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ROLE GATE
+  ══════════════════════════════════════════════════ -->
+  <div id="role-gate">
+    <div id="gate-blob-1"></div>
+    <div id="gate-blob-2"></div>
+    <div id="gate-blob-3"></div>
+    <div id="role-gate-card">
+      <div id="role-gate-logo">
+        <img id="gate-logo-img" src="/images/logo-light.png" alt="Agilysys" />
+      </div>
+      <p id="role-gate-sub">Select your role to continue</p>
+
+      <!-- Dropdown form (used when custom roles exist) -->
+      <div id="role-gate-form">
+        <label class="gate-label">Role
+          <select id="role-select" class="gate-input">
+            <option value="">Select role…</option>
+          </select>
+        </label>
+        <label class="gate-label">PIN
+          <input type="password" id="gate-pin-input" class="gate-input" placeholder="Enter PIN" maxlength="20" autocomplete="off" />
+        </label>
+        <button id="gate-login-btn" class="btn-pill-dark">Enter →</button>
+        <div id="gate-error" class="gate-error"></div>
+      </div>
+
+      <!-- Fallback two-card layout (shown when no custom roles exist) -->
+      <div id="role-gate-cards" style="display:none">
+        <div class="role-card" id="fallback-admin-card">
+          <div class="role-card-icon">👑</div>
+          <div class="role-card-title">Admin</div>
+          <div class="role-card-desc">Full edit access</div>
+          <input type="password" id="fallback-pin-input" class="gate-input" placeholder="Enter PIN" maxlength="20" />
+          <button id="fallback-pin-submit" class="btn-pill-dark" style="width:100%">Enter →</button>
+          <div id="fallback-error" class="gate-error"></div>
+        </div>
+        <div class="role-card" id="fallback-viewer-card">
+          <div class="role-card-icon">👁</div>
+          <div class="role-card-title">Viewer</div>
+          <div class="role-card-desc">Browse all dashboards</div>
+          <button id="viewer-enter-btn" class="btn-pill-ghost" style="width:100%;margin-top:8px">Enter as Viewer →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MAIN APP
+  ══════════════════════════════════════════════════ -->
+  <div id="app" class="hidden">
+
+    <!-- Topbar -->
+    <header id="topbar">
+      <div id="topbar-left">
+        <button id="sidebar-toggle" class="icon-btn" title="Toggle sidebar">
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><rect width="18" height="2" rx="1" fill="currentColor"/><rect y="6" width="18" height="2" rx="1" fill="currentColor"/><rect y="12" width="18" height="2" rx="1" fill="currentColor"/></svg>
+        </button>
+        <div id="topbar-logo">
+          <img id="topbar-logo-img" src="/images/logo-light.png" alt="Agilysys" />
+          <span id="topbar-appname">Reporting HUB</span>
+        </div>
+      </div>
+
+      <div id="topbar-search">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" id="search-input" placeholder="Search departments…" autocomplete="off" />
+      </div>
+
+      <div id="topbar-right">
+        <button id="theme-toggle-btn" class="icon-btn" title="Toggle theme">☀️</button>
+        <span id="role-badge"></span>
+        <button id="logout-btn" class="icon-btn" title="Log out" style="color:var(--muted)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11 11l3-3-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="8" x2="6" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button id="settings-btn" class="icon-btn admin-only" title="Settings">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M8.5 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.5"/><path d="M13.7 6.3a5.8 5.8 0 0 0-.5-1.2l.9-1.1-1.1-1.1-1.1.9a5.8 5.8 0 0 0-1.2-.5L10.4 2H7.6l-.3 1.3a5.8 5.8 0 0 0-1.2.5l-1.1-.9L3.9 4l.9 1.1a5.8 5.8 0 0 0-.5 1.2L3 6.6v2.8l1.3.3c.1.4.3.8.5 1.2l-.9 1.1 1.1 1.1 1.1-.9c.4.2.8.4 1.2.5l.3 1.3h2.8l.3-1.3c.4-.1.8-.3 1.2-.5l1.1.9 1.1-1.1-.9-1.1c.2-.4.4-.8.5-1.2l1.3-.3V6.6l-1.3-.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Role Banner (shown for all roles, color changes) -->
+    <div id="role-banner" style="display:none">
+      <span><span id="role-banner-dot"></span><span id="role-banner-text"></span></span>
+      <button id="banner-switch-btn">Switch Role →</button>
+    </div>
+
+    <div id="layout">
+
+      <!-- ── Sidebar ───────────────────────────────────────── -->
+      <nav id="sidebar">
+        <div id="sidebar-depts">
+          <div class="sidebar-section-label">Departments</div>
+          <ul id="dept-list"></ul>
+          <button id="add-dept-sidebar-btn" class="sidebar-add-btn admin-only">+ Add Department</button>
+        </div>
+
+        <div id="sidebar-quicklinks">
+          <div class="sidebar-section-label">Quick Links</div>
+          <div class="ql-group">
+            <div class="ql-label">⭐ Favorites</div>
+            <ul id="favorites-list"><li class="ql-empty">No favorites yet</li></ul>
+          </div>
+          <div class="ql-group">
+            <div class="ql-label">🕒 Recent</div>
+            <ul id="recent-list"><li class="ql-empty">Nothing viewed yet</li></ul>
+          </div>
+        </div>
+
+        <div id="sidebar-footer">
+          <button id="manage-btn" class="sidebar-footer-btn admin-only">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+            Manage
+          </button>
+          <button id="access-control-btn" class="sidebar-footer-btn admin-only">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 13c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Access Control
+          </button>
+          <button id="switch-role-btn" class="sidebar-footer-btn secondary">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L12 5L9 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 5H5a3 3 0 0 0 0 6h1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Switch Role
+          </button>
+        </div>
+      </nav>
+
+      <!-- ── Main ───────────────────────────────────────────── -->
+      <main id="main">
+
+        <!-- HOME -->
+        <div id="view-home" class="view active">
+          <div id="stats-bar">
+            <div class="stat-card" data-tile="amber">
+              <div class="stat-tile-icon">📊</div>
+              <div class="stat-value" id="stat-dashboards">—</div>
+              <div class="stat-label">Total Dashboards</div>
+            </div>
+            <div class="stat-card" data-tile="purple">
+              <div class="stat-tile-icon">🏢</div>
+              <div class="stat-value" id="stat-depts">—</div>
+              <div class="stat-label">Departments</div>
+            </div>
+            <div class="stat-card" data-tile="green">
+              <div class="stat-tile-icon">👥</div>
+              <div class="stat-value" id="stat-users">—</div>
+              <div class="stat-label">Roles / Users</div>
+            </div>
+            <div class="stat-card" data-tile="lime">
+              <div class="stat-tile-icon">⚡</div>
+              <div class="stat-value" id="stat-uptime">—</div>
+              <div class="stat-label">Server Uptime</div>
+            </div>
+          </div>
+
+          <div id="home-body">
+            <div id="home-depts-col">
+              <div class="section-header">
+                <h2 class="section-title">Departments</h2>
+                <button id="home-add-dept-btn" class="btn-pill-dark btn-sm admin-only">+ Add Department</button>
+              </div>
+              <div id="dept-cards"></div>
+            </div>
+            <div id="home-activity-col" class="admin-only">
+              <div class="section-header">
+                <h2 class="section-title">Recent Activity</h2>
+              </div>
+              <div id="activity-feed"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEPT VIEW -->
+        <div id="view-dept" class="view">
+          <div id="dept-view-header">
+            <div id="dept-view-title-row">
+              <span id="dept-view-icon"></span>
+              <div>
+                <h2 id="dept-view-name"></h2>
+                <p id="dept-view-desc"></p>
+              </div>
+            </div>
+            <button id="add-dashboard-btn" class="btn-pill-dark admin-only">+ Add Dashboard</button>
+          </div>
+          <div id="dashboard-grid"></div>
+          <div id="dashboard-empty" class="empty-state" style="display:none">
+            <div class="empty-icon">📭</div>
+            <p>No dashboards yet.</p>
+            <button id="empty-add-btn" class="btn-pill-dark btn-sm admin-only">+ Add Dashboard</button>
+          </div>
+        </div>
+
+        <!-- DASHBOARD VIEWER -->
+        <div id="view-dashboard" class="view">
+          <div id="viewer-toolbar">
+            <button id="back-btn" class="icon-btn-text">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back
+            </button>
+            <span id="viewer-dash-name"></span>
+            <div id="viewer-toolbar-right">
+              <button id="open-tab-btn" class="btn-outline-sm">↗ New Tab</button>
+              <button id="edit-dash-btn" class="btn-outline-sm admin-only" style="display:none">Edit</button>
+              <button id="delete-dash-btn" class="btn-danger-sm admin-only" style="display:none">Delete</button>
+            </div>
+          </div>
+          <div id="viewer-frame-wrap">
+            <iframe id="dashboard-frame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+            <div id="viewer-locked-overlay" style="display:none">
+              <div id="viewer-locked-inner">
+                <div style="font-size:48px">🔒</div>
+                <h3>Admin Only</h3>
+                <p>This dashboard is restricted to admins.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MANAGE -->
+        <div id="view-manage" class="view">
+          <div class="section-header" style="margin-bottom:24px">
+            <h2 class="section-title">Manage Departments</h2>
+            <button id="manage-add-dept-btn" class="btn-pill-dark btn-sm">+ Add Department</button>
+          </div>
+          <div id="manage-list"></div>
+        </div>
+
+        <!-- ACCESS CONTROL -->
+        <div id="view-access" class="view">
+          <div class="section-header" style="margin-bottom:24px">
+            <h2 class="section-title">Access Control</h2>
+            <div style="display:flex;gap:8px">
+              <button id="sync-roles-btn" class="btn-pill btn-sm" title="Auto-create one role per department">⟳ Sync from Departments</button>
+              <button id="create-role-btn" class="btn-pill-dark btn-sm">+ Create Role</button>
+            </div>
+          </div>
+          <div id="roles-list"></div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Viewer Lock Bar -->
+    <div id="viewer-lock-bar" style="display:none">
+      🔒 <span id="viewer-lock-text">View-only access</span>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toast-container"></div>
+
+  </div><!-- #app -->
+
+  <!-- ══════════════════════════════════════════════════
+       MODALS
+  ══════════════════════════════════════════════════ -->
+
+  <!-- Add / Edit Department -->
+  <div id="modal-dept" class="modal-overlay">
+    <div class="modal">
+      <h3 id="modal-dept-heading">Add Department</h3>
+      <div class="form-row">
+        <label class="form-label">Name
+          <input id="dept-name-input" type="text" class="form-input" placeholder="e.g. Marketing" />
+        </label>
+        <label class="form-label" style="max-width:90px">Icon
+          <input id="dept-icon-input" type="text" class="form-input" placeholder="📣" maxlength="4" />
+        </label>
+      </div>
+      <label class="form-label">Description
+        <input id="dept-desc-input" type="text" class="form-input" placeholder="Brief description…" />
+      </label>
+      <label class="form-label">Accent Color
+        <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+          <input id="dept-color-input" type="color" class="color-picker" value="#0284c7" />
+          <span class="form-hint">Used for card glow and highlights</span>
+        </div>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-cancel" data-modal="modal-dept">Cancel</button>
+        <button id="modal-dept-save" class="btn-pill-dark">Save →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Dashboard -->
+  <div id="modal-dashboard" class="modal-overlay">
+    <div class="modal modal-wide">
+      <h3>Add Dashboard</h3>
+      <label class="form-label">Name
+        <input id="dash-name-input" type="text" class="form-input" placeholder="Dashboard name" />
+      </label>
+      <label class="form-label">Description
+        <input id="dash-desc-input" type="text" class="form-input" placeholder="Optional description" />
+      </label>
+      <div class="form-row">
+        <label class="form-label">Type
+          <select id="dash-type-select" class="form-input">
+            <option value="powerbi">Power BI</option>
+            <option value="excel">Excel Online</option>
+            <option value="looker">Looker Studio</option>
+            <option value="tableau">Tableau Public</option>
+            <option value="url">Any URL</option>
+            <option value="file">Upload HTML File</option>
+          </select>
+        </label>
+        <label class="form-label">Access
+          <select id="dash-access-select" class="form-input">
+            <option value="all">All Users</option>
+            <option value="admin">Admin Only</option>
+          </select>
+        </label>
+      </div>
+      <div id="dash-url-field">
+        <label class="form-label">Embed URL
+          <input id="dash-url-input" type="url" class="form-input" placeholder="https://…" />
+        </label>
+      </div>
+      <div id="dash-file-field" style="display:none">
+        <label class="form-label">HTML File
+          <input id="dash-file-input" type="file" class="form-input" accept=".html,text/html" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-cancel" data-modal="modal-dashboard">Cancel</button>
+        <button id="modal-dashboard-save" class="btn-pill-dark">Add Dashboard →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Dashboard -->
+  <div id="modal-edit-dashboard" class="modal-overlay">
+    <div class="modal modal-wide">
+      <h3>Edit Dashboard</h3>
+      <label class="form-label">Name
+        <input id="edit-dash-name-input" type="text" class="form-input" />
+      </label>
+      <label class="form-label">Description
+        <input id="edit-dash-desc-input" type="text" class="form-input" />
+      </label>
+      <div id="edit-dash-url-field" style="display:none">
+        <label class="form-label">Embed URL
+          <input id="edit-dash-url-input" type="url" class="form-input" />
+        </label>
+      </div>
+      <label class="form-label">Access Level
+        <select id="edit-dash-access-select" class="form-input">
+          <option value="all">All Users</option>
+          <option value="admin">Admin Only</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-cancel" data-modal="modal-edit-dashboard">Cancel</button>
+        <button id="modal-edit-dashboard-save" class="btn-pill-dark">Save Changes →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Edit Role -->
+  <div id="modal-role" class="modal-overlay">
+    <div class="modal modal-wide">
+      <h3 id="modal-role-heading">Create Role</h3>
+      <div class="form-row">
+        <label class="form-label">Role Name
+          <input id="role-name-input" type="text" class="form-input" placeholder="e.g. Finance Team" />
+        </label>
+        <label class="form-label">PIN
+          <input id="role-pin-input" type="password" class="form-input" placeholder="e.g. 5678" />
+        </label>
+      </div>
+      <label class="form-label">Allowed Departments
+        <div id="role-dept-checklist" class="dept-checklist"></div>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-cancel" data-modal="modal-role">Cancel</button>
+        <button id="modal-role-save" class="btn-pill-dark">Save Role →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div id="modal-settings" class="modal-overlay">
+    <div class="modal">
+      <h3>Settings</h3>
+      <label class="form-label">App Name
+        <input id="settings-appname-input" type="text" class="form-input" />
+      </label>
+      <label class="form-label">Uptime % (displayed on home)
+        <input id="settings-uptime-input" type="number" class="form-input" min="0" max="100" />
+      </label>
+      <hr class="modal-divider" />
+      <p class="form-hint" style="margin-bottom:0">Change Admin PIN</p>
+      <div class="form-row">
+        <label class="form-label">New PIN
+          <input id="settings-pin-input" type="password" class="form-input" placeholder="Leave blank to keep" />
+        </label>
+        <label class="form-label">Confirm PIN
+          <input id="settings-pin-confirm-input" type="password" class="form-input" placeholder="Repeat new PIN" />
+        </label>
+      </div>
+      <hr class="modal-divider" />
+      <p class="form-hint" style="margin-bottom:0">Reset a Role PIN</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:-4px">Use this if a team member forgets their PIN.</p>
+      <div class="form-row">
+        <label class="form-label">Role
+          <select id="settings-role-reset-select" class="form-input">
+            <option value="">Select role…</option>
+          </select>
+        </label>
+        <label class="form-label">New PIN
+          <input id="settings-role-reset-pin" type="text" class="form-input" placeholder="Enter new PIN" maxlength="20" />
+        </label>
+      </div>
+      <button id="settings-role-reset-btn" class="btn-ghost" style="width:fit-content">Reset Role PIN →</button>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-cancel" data-modal="modal-settings">Cancel</button>
+        <button id="modal-settings-save" class="btn-pill-dark">Save Settings →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete -->
+  <div id="modal-confirm" class="modal-overlay">
+    <div class="modal modal-sm">
+      <div class="confirm-icon">🗑️</div>
+      <h3 id="confirm-title">Are you sure?</h3>
+      <p id="confirm-message"></p>
+      <div class="modal-actions">
+        <button class="btn-ghost modal-cancel" data-modal="modal-confirm">Cancel</button>
+        <button id="confirm-ok" class="btn-danger-pill">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/theme.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+Reporting HUB — Login PINs
+==========================
+
+Role                    PIN       Departments
+-------------------------------------------------
+Admin                   1234      Full access (all departments)
+Accounts Receivables    0000      Accounts Receivables only      ⚠ Change PIN
+Finance Viewers         9012      Finance only
+HR Team                 5678      HR only
+Sales Team              3456      Sales only
+Operations Team         7890      Operations only
+Accounts Payable        0000      Accounts Payable only          ⚠ Change PIN
+
+URL: http://localhost:3000
+
+⚠ Roles marked above were auto-created with default PIN 0000.
+  Update them via: Admin login → Access Control → Edit role.
