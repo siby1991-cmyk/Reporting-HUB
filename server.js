@@ -330,7 +330,8 @@ app.put('/api/dashboards/:id', requirePin, (req, res) => {
   if (description !== undefined) dash.description = description;
   if (url !== undefined && dash.type !== 'file') dash.url = url;
   if (accessLevel !== undefined) dash.accessLevel = accessLevel;
-  logActivity(db, 'dashboard_updated', `"${dash.name}" updated`, '');
+  const updDept = db.departments.find(d => d.id === dash.departmentId);
+  logActivity(db, 'dashboard_updated', `"${dash.name}" updated`, updDept ? updDept.name : '');
   writeDB(db);
   res.json(dash);
 });
@@ -343,9 +344,10 @@ app.delete('/api/dashboards/:id', requirePin, (req, res) => {
     const fp = path.join(UPLOADS_DIR, dash.departmentId, dash.filename);
     if (fs.existsSync(fp)) fs.unlinkSync(fp);
   }
-  const name = dash.name;
+  const name    = dash.name;
+  const delDept = db.departments.find(d => d.id === dash.departmentId);
   db.dashboards.splice(idx, 1);
-  logActivity(db, 'dashboard_deleted', `"${name}" deleted`, '');
+  logActivity(db, 'dashboard_deleted', `"${name}" deleted`, delDept ? delDept.name : '');
   writeDB(db);
   res.json({ ok: true });
 });

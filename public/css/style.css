@@ -422,7 +422,8 @@ html, body {
 
 .stat-tile-icon { font-size: 18px; margin-bottom: 8px; }
 .stat-value {
-  font-family: 'Instrument Serif', serif; font-style: italic;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+  font-style: normal; letter-spacing: -0.03em;
   font-size: 34px; line-height: 1; margin-bottom: 6px;
 }
 [data-theme="dark"] .stat-card[data-tile="amber"]  .stat-value { color: #fff; }
@@ -543,7 +544,18 @@ html, body {
 .dash-card-desc { font-size: 12px; color: var(--muted2); line-height: 1.55; }
 .dash-access-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-pill); background: rgba(219,39,119,.1); color: #db2777; border: 1px solid rgba(219,39,119,.2); align-self: flex-start; }
 [data-theme="dark"] .dash-access-badge { background: rgba(255,77,143,.1); color: #ff4d8f; border-color: rgba(255,77,143,.2); }
-.dash-card-actions { display: flex; gap: 8px; padding-top: 4px; margin-top: auto; }
+.dash-card-actions { display: flex; gap: 8px; padding-top: 4px; margin-top: auto; align-items: center; }
+
+.btn-fav {
+  margin-left: auto; background: none; border: none; padding: 4px 6px;
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 16px; line-height: 1;
+  color: var(--muted); transition: color .15s, transform .15s;
+  flex-shrink: 0;
+}
+.btn-fav:hover { transform: scale(1.2); }
+.btn-fav.is-fav { color: #f59e0b; }
+[data-theme="dark"] .btn-fav { color: var(--muted); }
+[data-theme="dark"] .btn-fav.is-fav { color: #fbbf24; }
 
 /* ── Empty State ───────────────────────────────────────────────────────────── */
 .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -733,6 +745,8 @@ html, body {
 /* ── Admin/Role visibility ─────────────────────────────────────────────────── */
 .admin-only { display: none; }
 body.is-admin .admin-only { display: flex; }
+body.is-admin .ql-group.admin-only { display: block; }
+body:not(.is-admin) #home-activity-col { display: none !important; }
 body.is-admin #home-activity-col { display: flex; }
 body.is-admin #settings-btn { display: flex; }
 body.is-admin #add-dept-sidebar-btn { display: block; }

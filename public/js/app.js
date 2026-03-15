@@ -254,6 +254,7 @@ async function loadActivity() {
   try {
     const items = await fetch('/api/activity').then(r => r.json());
     const feed  = document.getElementById('activity-feed');
+
     if (!items || items.length === 0) {
       feed.innerHTML = '<div class="empty-state"><p>No activity yet.</p></div>';
       return;
@@ -310,6 +311,7 @@ function renderDashboards(deptId) {
     const card = document.createElement('div');
     card.className = 'dash-card';
     const isAdminOnly = dash.accessLevel === 'admin';
+    const isFav = getFavs().some(f => f.id === dash.id);
     card.innerHTML = `
       <div class="dash-card-top">
         <span class="dash-card-name">${esc(dash.name)}</span>
@@ -321,6 +323,7 @@ function renderDashboards(deptId) {
         <button class="btn-view-sm" data-action="view" data-id="${dash.id}">View</button>
         <button class="btn-edit-sm admin-only" data-action="edit" data-id="${dash.id}" style="display:none">Edit</button>
         <button class="btn-danger-sm admin-only" data-action="delete" data-id="${dash.id}" style="display:none">Delete</button>
+        <button class="btn-fav ${isFav ? 'is-fav' : ''}" data-action="fav" data-id="${dash.id}" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${isFav ? '★' : '☆'}</button>
       </div>
     `;
     if (isAdmin()) {
@@ -332,6 +335,7 @@ function renderDashboards(deptId) {
         if (btn.dataset.action === 'view')   navigate(`#/dept/${deptId}/dashboard/${dash.id}`);
         if (btn.dataset.action === 'edit')   openEditDashModal(dash);
         if (btn.dataset.action === 'delete') confirmDeleteDash(dash);
+        if (btn.dataset.action === 'fav')    toggleFav(dash, deptId, btn);
       });
     });
     grid.appendChild(card);
@@ -784,7 +788,9 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
 /* ── Favorites ─────────────────────────────────────────────────────────────── */
 function getFavs() { try { return JSON.parse(localStorage.getItem('rh_favorites')) || []; } catch { return []; } }
 function renderFavorites() {
-  const favs = getFavs(), list = document.getElementById('favorites-list');
+  const visibleIds = new Set(getVisibleDepts().map(d => d.id));
+  const favs = getFavs().filter(f => visibleIds.has(f.deptId));
+  const list = document.getElementById('favorites-list');
   list.innerHTML = '';
   if (!favs.length) { list.innerHTML = '<li class="ql-empty">No favorites yet</li>'; return; }
   favs.slice(0, 5).forEach(f => {
@@ -793,6 +799,23 @@ function renderFavorites() {
     li.addEventListener('click', () => navigate(`#/dept/${f.deptId}/dashboard/${f.id}`));
     list.appendChild(li);
   });
+}
+function toggleFav(dash, deptId, btn) {
+  let favs = getFavs();
+  const idx = favs.findIndex(f => f.id === dash.id);
+  if (idx === -1) {
+    favs.push({ id: dash.id, name: dash.name, deptId });
+    btn.classList.add('is-fav');
+    btn.textContent = '★';
+    btn.title = 'Remove from favorites';
+  } else {
+    favs.splice(idx, 1);
+    btn.classList.remove('is-fav');
+    btn.textContent = '☆';
+    btn.title = 'Add to favorites';
+  }
+  localStorage.setItem('rh_favorites', JSON.stringify(favs));
+  renderFavorites();
 }
 
 /* ── Recently Viewed ───────────────────────────────────────────────────────── */
@@ -807,6 +830,9 @@ function addToRecent(item) {
 function renderRecent() {
   let list = [];
   try { list = JSON.parse(localStorage.getItem('rh_recent')) || []; } catch {}
+  // Filter to only depts visible to current role
+  const visibleIds = new Set(getVisibleDepts().map(d => d.id));
+  list = list.filter(r => visibleIds.has(r.deptId));
   const el = document.getElementById('recent-list');
   el.innerHTML = '';
   if (!list.length) { el.innerHTML = '<li class="ql-empty">Nothing viewed yet</li>'; return; }
@@ -873,7 +899,11 @@ document.getElementById('home-add-dept-btn').addEventListener('click', openAddDe
 document.getElementById('add-dashboard-btn').addEventListener('click', openAddDashboardModal);
 document.getElementById('empty-add-btn').addEventListener('click',     openAddDashboardModal);
 document.getElementById('settings-btn').addEventListener('click',      openSettingsModal);
-document.getElementById('logout-btn').addEventListener('click',        switchRole);
+document.getElementById('logout-btn').addEventListener('click', () => {
+  const wasAdmin = isAdmin();
+  switchRole();
+  if (wasAdmin) { window.location.href = '/admin'; }
+});
 document.getElementById('banner-switch-btn').addEventListener('click', switchRole);
 document.getElementById('switch-role-btn').addEventListener('click',   switchRole);
 
