@@ -197,6 +197,19 @@
 
     loginBtn.addEventListener('click', attemptLogin);
     pinInput.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
+
+    // Apply custom branding (logo + accent color) on admin gate
+    (async () => {
+      try {
+        const cfg = await fetch('/api/config/public').then(r => r.json());
+        if (cfg.accentColor) {
+          document.documentElement.style.setProperty('--accent', cfg.accentColor);
+        }
+        if (cfg.brandLogoDark) {
+          document.querySelector('.logo-wrap img').src = cfg.brandLogoDark;
+        }
+      } catch {}
+    })();
   </script>
 </body>
 </html>

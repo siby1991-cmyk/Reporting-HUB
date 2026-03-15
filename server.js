@@ -9,9 +9,11 @@ const PORT = process.env.PORT || 3000;
 
 const DATA_FILE  = path.join(__dirname, 'data', 'db.json');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const IMAGES_DIR  = path.join(__dirname, 'public', 'images');
 
 fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+fs.mkdirSync(IMAGES_DIR,  { recursive: true });
 
 // ── Seed data ──────────────────────────────────────────────────────────────────
 const DEPT_DEFAULTS = {
@@ -121,6 +123,23 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }
 });
 
+// ── Brand logo multer ─────────────────────────────────────────────────────────
+const brandStorage = multer.diskStorage({
+  destination(req, file, cb) { cb(null, IMAGES_DIR); },
+  filename(req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase() || '.png';
+    cb(null, file.fieldname === 'logoLight' ? `brand-light${ext}` : `brand-dark${ext}`);
+  }
+});
+const brandUpload = multer({
+  storage: brandStorage,
+  fileFilter(req, file, cb) {
+    ['.png','.jpg','.jpeg','.svg','.webp'].includes(path.extname(file.originalname).toLowerCase())
+      ? cb(null, true) : cb(new Error('Image files only (.png .jpg .svg .webp)'));
+  },
+  limits: { fileSize: 2 * 1024 * 1024 }
+});
+
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(express.json());
 
@@ -149,13 +168,36 @@ app.get('/api/config/public', (req, res) => {
     ? 99.9
     : Math.min(99.9, +(100 - (Math.random() * 0.1)).toFixed(1)); // realistic value until 30d data
   res.json({
-    appName:       db.config.appName,
-    activeUsers:   roleCount,
-    uptimePercent: uptimePct,
-    serverUptimeSecs: Math.floor(uptimeSecs)
+    appName:          db.config.appName,
+    activeUsers:      roleCount,
+    uptimePercent:    uptimePct,
+    serverUptimeSecs: Math.floor(uptimeSecs),
+    accentColor:      db.config.accentColor    || null,
+    brandLogoLight:   db.config.brandLogoLight || null,
+    brandLogoDark:    db.config.brandLogoDark  || null
   });
 });
 app.get('/api/config', requirePin, (req, res) => res.json(readDB().config));
+
+// ── Branding (logo upload + accent color) ─────────────────────────────────────
+app.post('/api/config/branding', requirePin, (req, res) => {
+  brandUpload.fields([{ name: 'logoLight', maxCount: 1 }, { name: 'logoDark', maxCount: 1 }])(req, res, err => {
+    if (err) return res.status(400).json({ error: err.message });
+    const db = readDB();
+    const { accentColor, appName } = req.body;
+    if (accentColor !== undefined) db.config.accentColor = accentColor;
+    if (appName     !== undefined) db.config.appName     = appName;
+    if (req.files?.logoLight?.[0]) db.config.brandLogoLight = `/images/${req.files.logoLight[0].filename}`;
+    if (req.files?.logoDark?.[0])  db.config.brandLogoDark  = `/images/${req.files.logoDark[0].filename}`;
+    writeDB(db);
+    res.json({
+      accentColor:    db.config.accentColor,
+      appName:        db.config.appName,
+      brandLogoLight: db.config.brandLogoLight,
+      brandLogoDark:  db.config.brandLogoDark
+    });
+  });
+});
 app.put('/api/config', requirePin, (req, res) => {
   const db = readDB();
   const { appName, adminPin, activeUsers, uptimePercent } = req.body;

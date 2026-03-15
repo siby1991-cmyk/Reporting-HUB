@@ -711,6 +711,25 @@ function confirmDeleteRole(roleId, roleName) {
   });
 }
 
+/* ── Branding ──────────────────────────────────────────────────────────────── */
+function applyBranding(config) {
+  if (!config) return;
+  // Accent color
+  if (config.accentColor) {
+    document.documentElement.style.setProperty('--accent', config.accentColor);
+  }
+  // Logo srcs
+  const lightSrc = config.brandLogoLight || '/images/logo-light.png';
+  const darkSrc  = config.brandLogoDark  || '/images/logo-dark.png';
+  window._brandLogoLight = lightSrc;
+  window._brandLogoDark  = darkSrc;
+  const isDark   = document.body.dataset.theme === 'dark';
+  const topbarImg = document.getElementById('topbar-logo-img');
+  const gateImg   = document.getElementById('gate-logo-img');
+  if (topbarImg) topbarImg.src = isDark ? darkSrc : lightSrc;
+  if (gateImg)   gateImg.src  = darkSrc;
+}
+
 /* ── Settings Modal ────────────────────────────────────────────────────────── */
 async function openSettingsModal() {
   try {
@@ -724,6 +743,15 @@ async function openSettingsModal() {
     document.getElementById('settings-pin-confirm-input').value = '';
     document.getElementById('settings-role-reset-pin').value = '';
 
+    // Populate branding fields
+    document.getElementById('settings-accent-color').value = config.accentColor || '#aaeb3d';
+    const llp = document.getElementById('settings-logo-light-preview');
+    const ldp = document.getElementById('settings-logo-dark-preview');
+    if (config.brandLogoLight) { llp.src = config.brandLogoLight; llp.style.display = 'block'; }
+    else llp.style.display = 'none';
+    if (config.brandLogoDark)  { ldp.src = config.brandLogoDark;  ldp.style.display = 'block'; }
+    else ldp.style.display = 'none';
+
     // Populate role reset dropdown
     const sel = document.getElementById('settings-role-reset-select');
     sel.innerHTML = '<option value="">Select role…</option>';
@@ -732,6 +760,39 @@ async function openSettingsModal() {
     openModal('modal-settings');
   } catch (e) { toast(e.message, 'error'); }
 }
+
+// Live preview for logo file inputs
+document.getElementById('settings-logo-light').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const prev = document.getElementById('settings-logo-light-preview');
+  prev.src = URL.createObjectURL(file); prev.style.display = 'block';
+});
+document.getElementById('settings-logo-dark').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const prev = document.getElementById('settings-logo-dark-preview');
+  prev.src = URL.createObjectURL(file); prev.style.display = 'block';
+});
+
+document.getElementById('settings-branding-save').addEventListener('click', async () => {
+  const btn = document.getElementById('settings-branding-save');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const fd = new FormData();
+    fd.append('accentColor', document.getElementById('settings-accent-color').value);
+    const lightFile = document.getElementById('settings-logo-light').files[0];
+    const darkFile  = document.getElementById('settings-logo-dark').files[0];
+    if (lightFile) fd.append('logoLight', lightFile);
+    if (darkFile)  fd.append('logoDark',  darkFile);
+    const pin = getPin();
+    const res = await fetch('/api/config/branding', { method: 'POST', headers: { 'X-Admin-PIN': pin }, body: fd });
+    if (!res.ok) throw new Error((await res.json()).error || 'Failed');
+    const branding = await res.json();
+    applyBranding(branding);
+    if (branding.appName) document.getElementById('topbar-appname').textContent = branding.appName;
+    toast('Branding saved!');
+  } catch (e) { toast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Save Branding →'; }
+});
 
 document.getElementById('settings-role-reset-btn').addEventListener('click', async () => {
   const roleId = document.getElementById('settings-role-reset-select').value;
@@ -916,6 +977,7 @@ async function init() {
     document.getElementById('topbar-appname').textContent = appConfig.appName;
     document.title = appConfig.appName;
   }
+  applyBranding(appConfig);
   renderBanners();
   renderSidebar();
   renderFavorites();

@@ -8,6 +8,13 @@
     document.body.dataset.theme = t;
     if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
     localStorage.setItem(THEME_KEY, t);
+    // Swap topbar logo when theme changes
+    const topbarImg = document.getElementById('topbar-logo-img');
+    if (topbarImg) {
+      topbarImg.src = t === 'dark'
+        ? (window._brandLogoDark  || '/images/logo-dark.png')
+        : (window._brandLogoLight || '/images/logo-light.png');
+    }
   }
 
   // Apply immediately on load (before paint)

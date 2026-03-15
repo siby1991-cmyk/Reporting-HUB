@@ -406,6 +406,25 @@
         <input id="settings-uptime-input" type="number" class="form-input" min="0" max="100" />
       </label>
       <hr class="modal-divider" />
+      <p class="form-hint" style="margin-bottom:0">Branding</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:-4px">Customize logo and accent color for your company.</p>
+      <div class="form-row">
+        <label class="form-label">Logo — Light Theme
+          <input id="settings-logo-light" type="file" accept="image/*" class="form-input" style="padding:6px 10px;" />
+        </label>
+        <label class="form-label">Logo — Dark Theme
+          <input id="settings-logo-dark" type="file" accept="image/*" class="form-input" style="padding:6px 10px;" />
+        </label>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;margin-top:-4px;margin-bottom:4px">
+        <img id="settings-logo-light-preview" style="height:30px;object-fit:contain;display:none;border-radius:4px;" alt="Light logo preview" />
+        <img id="settings-logo-dark-preview"  style="height:30px;object-fit:contain;display:none;border-radius:4px;background:#1c1f26;padding:4px 8px;" alt="Dark logo preview" />
+      </div>
+      <label class="form-label" style="max-width:200px">Accent Color
+        <input id="settings-accent-color" type="color" class="form-input" style="height:42px;padding:4px 8px;cursor:pointer;" />
+      </label>
+      <button id="settings-branding-save" class="btn-pill-dark" style="width:fit-content">Save Branding →</button>
+      <hr class="modal-divider" />
       <p class="form-hint" style="margin-bottom:0">Change Admin PIN</p>
       <div class="form-row">
         <label class="form-label">New PIN

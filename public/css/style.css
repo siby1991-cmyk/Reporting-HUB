@@ -151,8 +151,7 @@ html, body {
 }
 #gate-logo-img {
   height: 56px; width: auto; object-fit: contain; display: block;
-  content: url('/images/logo-dark.png');  /* always use dark logo on gate */
-  mix-blend-mode: screen;               /* black bg disappears, logo floats */
+  mix-blend-mode: screen;
 }
 
 #role-gate-sub {
@@ -238,9 +237,6 @@ html, body {
   object-fit: contain;
   display: block;
   transition: opacity 0.2s ease;
-}
-[data-theme="dark"] #topbar-logo-img {
-  content: url('/images/logo-dark.png');
 }
 #topbar-appname {
   font-family: 'Plus Jakarta Sans', sans-serif;
