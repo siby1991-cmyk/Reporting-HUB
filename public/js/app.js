@@ -204,9 +204,14 @@ function renderDeptCards() {
     const color = getDeptColor(dept);
     const card  = document.createElement('div');
     card.className = 'dept-card';
-    card.style.cssText = `border-color:${color}20; animation-delay:${i * 0.05}s`;
+    card.style.cssText = `--dept-color:${color}; border-color:${color}18; animation-delay:${i * 0.05}s`;
     card.innerHTML = `
       <div class="dept-card-orb" style="background:${esc(color)}"></div>
+      ${isAdmin() ? `
+      <div class="dept-card-admin-actions">
+        <button class="btn-icon btn-icon-edit" data-action="edit" data-id="${dept.id}" title="Edit">✏️</button>
+        <button class="btn-icon btn-icon-delete" data-action="delete" data-id="${dept.id}" title="Delete">🗑</button>
+      </div>` : ''}
       <div class="dept-card-top">
         <div class="dept-card-icon-box" style="background:${color}18">${dept.icon}</div>
         <span class="dept-card-status">Active</span>
@@ -214,18 +219,12 @@ function renderDeptCards() {
       <div class="dept-card-name">${esc(dept.name)}</div>
       <div class="dept-card-desc">${esc(dept.description || '')}</div>
       <div class="dept-card-footer">
-        <span class="dept-card-count" style="color:${color};font-weight:700">${count}</span>
-        <span class="dept-card-count"> dashboard${count!==1?'s':''}</span>
+        <span class="dept-card-count"><strong style="color:${color}">${count}</strong> dashboard${count!==1?'s':''}</span>
         <div class="dept-card-actions">
-          <button class="btn-edit-sm admin-only" data-action="edit" data-id="${dept.id}" style="display:none">✏️ Edit</button>
-          <button class="btn-danger-sm admin-only" data-action="delete" data-id="${dept.id}" style="display:none">🗑</button>
-          <button class="btn-view-sm" data-action="view" data-id="${dept.id}">Open →</button>
+          <button class="btn-view-sm" data-action="view" data-id="${dept.id}">→ Open</button>
         </div>
       </div>
     `;
-    if (isAdmin()) {
-      card.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-flex');
-    }
     card.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
@@ -326,9 +325,6 @@ function renderDashboards(deptId) {
         <button class="btn-fav ${isFav ? 'is-fav' : ''}" data-action="fav" data-id="${dash.id}" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${isFav ? '★' : '☆'}</button>
       </div>
     `;
-    if (isAdmin()) {
-      card.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-flex');
-    }
     card.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
@@ -712,11 +708,24 @@ function confirmDeleteRole(roleId, roleName) {
 }
 
 /* ── Branding ──────────────────────────────────────────────────────────────── */
+function contrastText(hex) {
+  // Returns black or white depending on luminance of hex color
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  const luminance = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return luminance > 0.55 ? '#1a1a1a' : '#ffffff';
+}
+function setAccentColor(hex) {
+  document.body.style.setProperty('--accent',      hex);
+  document.body.style.setProperty('--accent-text', contrastText(hex));
+}
+
 function applyBranding(config) {
   if (!config) return;
   // Accent color
   if (config.accentColor) {
-    document.documentElement.style.setProperty('--accent', config.accentColor);
+    setAccentColor(config.accentColor);
   }
   // Logo srcs
   const lightSrc = config.brandLogoLight || '/images/logo-light.png';
@@ -760,6 +769,16 @@ async function openSettingsModal() {
     openModal('modal-settings');
   } catch (e) { toast(e.message, 'error'); }
 }
+
+// Live accent color preview — updates entire UI as you drag the picker
+document.getElementById('settings-accent-color').addEventListener('input', e => {
+  setAccentColor(e.target.value);
+});
+document.getElementById('settings-accent-reset').addEventListener('click', () => {
+  const def = '#aaeb3d';
+  document.getElementById('settings-accent-color').value = def;
+  setAccentColor(def);
+});
 
 // Live preview for logo file inputs
 document.getElementById('settings-logo-light').addEventListener('change', e => {

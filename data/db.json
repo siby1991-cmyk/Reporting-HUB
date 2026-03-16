@@ -31,7 +31,7 @@
       "id": "hr",
       "name": "HR",
       "icon": "👥",
-      "order": 3,
+      "order": 4,
       "createdAt": "2026-03-14T00:00:00.000Z",
       "description": "Headcount, attrition, hiring pipeline and employee engagement.",
       "color": "#ff4d8f"
@@ -40,7 +40,7 @@
       "id": "sales",
       "name": "Sales",
       "icon": "📈",
-      "order": 4,
+      "order": 3,
       "createdAt": "2026-03-14T00:00:00.000Z",
       "description": "Pipeline, revenue, quota attainment and sales performance.",
       "color": "#00e5a0"
