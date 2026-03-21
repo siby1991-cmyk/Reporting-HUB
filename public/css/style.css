@@ -110,16 +110,8 @@ html, body {
 /* WebGL shader canvas — disabled, using CSS gradient bg instead */
 #gate-canvas { display: none; }
 
-/* Ambient gradient orbs behind the gate */
-#role-gate::before {
-  content: '';
-  position: absolute; inset: 0; pointer-events: none;
-  background:
-    radial-gradient(ellipse 60% 50% at 15% 20%, rgba(168,230,61,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 85% 80%, rgba(99,60,220,0.22) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 40% at 50% 110%, rgba(16,185,129,0.12) 0%, transparent 50%),
-    radial-gradient(ellipse 30% 30% at 80% 10%,  rgba(59,130,246,0.15) 0%, transparent 50%);
-}
+/* Ambient gradient orbs — cleared, gradient wave canvas handles the background */
+#role-gate::before { content: none; }
 
 /* Floating animated blobs */
 #gate-blob-1, #gate-blob-2, #gate-blob-3 {
@@ -135,13 +127,13 @@ html, body {
 /* Glass card */
 #role-gate-card {
   position: relative; z-index: 1;
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(10,15,26,0.55);
+  backdrop-filter: blur(28px) saturate(1.4); -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border: 1px solid rgba(255,255,255,0.10);
   border-radius: 24px;
   padding: 44px 48px;
   width: 440px; max-width: 95vw;
-  box-shadow: 0 8px 48px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.08) inset;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.06) inset;
   display: flex; flex-direction: column; gap: 22px;
   animation: gateIn .5s cubic-bezier(0.22,1,0.36,1);
 }

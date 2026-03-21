@@ -190,6 +190,9 @@
               <div id="activity-feed"></div>
             </div>
           </div>
+
+          <!-- Dithering CTA banner -->
+          <div id="home-dithering-slot"></div>
         </div>
 
         <!-- DEPT VIEW -->
@@ -480,5 +483,26 @@
   <script src="/js/app.js"></script>
   <script src="/js/gate-shader.js"></script>
   <script src="/js/bg-shader.js"></script>
+  <script src="/js/shader-hero.js"></script>
+  <script src="/js/dithering-hero.js"></script>
+  <script>
+    // Gate background
+    document.querySelectorAll('#gate-blob-1,#gate-blob-2,#gate-blob-3')
+      .forEach(function(el){ el.style.display='none'; });
+    var gate = document.getElementById('role-gate');
+    if (gate) gate.style.background = 'transparent';
+    ShaderHero.init({ container: gate });
+
+    // Home dithering CTA card
+    DitheringCard.init({
+      container:   document.getElementById('home-dithering-slot'),
+      badgeText:   'Reporting HUB',
+      title:       'Your data, centralised.',
+      titleSub:    'always one click away.',
+      description: 'Every department, every report, every team — organised, secured, and instantly accessible from a single hub.',
+      buttonText:  'Browse Departments',
+      buttonHref:  '#/dept/operations'
+    });
+  </script>
 </body>
 </html>

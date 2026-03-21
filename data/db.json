@@ -75,6 +75,16 @@
       "uploadedAt": "2026-03-14T16:57:09.326Z",
       "url": "https://app.powerbi.com/groups/me/reports/39b89706-6d78-447a-92c2-8f1b0e474ba2/b044dbc0bbd14737c580?ctid=9750a820-9364-4bc3-9990-123c1645274b&experience=power-bi",
       "accessLevel": "all"
+    },
+    {
+      "id": "aca2a5d9-1a7b-4544-a945-7d2257ff2efa",
+      "departmentId": "sales",
+      "name": "Sales List",
+      "description": "",
+      "type": "file",
+      "accessLevel": "all",
+      "uploadedAt": "2026-03-20T11:13:36.098Z",
+      "filename": "4ae04385-7024-4436-a21d-da991003caf0-demo-dashboard.html"
     }
   ],
   "config": {
@@ -84,6 +94,14 @@
     "uptimePercent": 99
   },
   "activity": [
+    {
+      "id": "66df3489-94f7-4ad2-9222-f0bb850500bf",
+      "action": "dashboard_added",
+      "label": "\"Sales List\" added to Sales",
+      "department": "Sales",
+      "user": "Admin",
+      "timestamp": "2026-03-20T11:13:36.099Z"
+    },
     {
       "id": "29d698d7-435d-4ba6-820e-6143381512f1",
       "action": "dept_created",
@@ -157,7 +175,7 @@
     {
       "id": "b4e816ab-c32d-4e6a-adbd-0251f0383665",
       "name": "Accounts Receivables",
-      "pin": "0000",
+      "pin": "4567",
       "allowedDepartments": [
         "accounts-receivables"
       ],
@@ -166,7 +184,7 @@
     {
       "id": "aa83039a-7f09-4654-bbcf-fe5de8ad144d",
       "name": "Accounts Payable",
-      "pin": "0000",
+      "pin": "6789",
       "allowedDepartments": [
         "accounts-payable"
       ],

@@ -103,9 +103,11 @@ At `http://localhost:3000`, select your role from the dropdown:
 | Role | PIN | Access |
 |---|---|---|
 | HR Team | `5678` | HR department only |
-| Finance Viewers | `9012` | Finance + Accounts Receivables |
+| Finance Viewers | `9012` | Finance only |
 | Sales Team | `3456` | Sales only |
 | Operations Team | `7890` | Operations only |
+| Accounts Receivables | `4567` | Accounts Receivables only |
+| Accounts Payable | `6789` | Accounts Payable only |
 
 ---
 

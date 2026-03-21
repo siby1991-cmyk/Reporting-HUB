@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reporting HUB — Senior Management Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #aaeb3d;
+      --accent-text: #3d6b00;
+      --bg: #f4f5f7;
+      --bg2: #ffffff;
+      --bg3: #f0f1f5;
+      --text: #0d1117;
+      --text2: #374151;
+      --muted: #6b7280;
+      --border: rgba(0,0,0,0.08);
+      --shadow: 0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+      --radius: 18px;
+      --radius-pill: 999px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo-dot {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { background: var(--bg3); color: var(--text); }
+    .nav-cta {
+      background: #0d1117;
+      color: #fff !important;
+      padding: 7px 18px !important;
+      border-radius: var(--radius-pill) !important;
+    }
+    .nav-cta:hover { background: #1f2937 !important; color: #fff !important; }
+
+    /* ── SECTIONS ── */
+    section {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+    section.full {
+      max-width: 100%;
+      padding: 0;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 90px 24px 80px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(170,235,61,0.15);
+      color: var(--accent-text);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 24px;
+      border: 1px solid rgba(170,235,61,0.3);
+    }
+    .hero-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--text);
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 36px;
+      font-weight: 500;
+      line-height: 1.7;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: #0d1117;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+    .btn-accent {
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(170,235,61,0.3); }
+
+    /* ── DASHBOARD MOCKUP ── */
+    .mockup-wrap {
+      max-width: 960px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+    .mockup {
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .mockup-bar {
+      background: #f0f1f5;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-url {
+      flex: 1;
+      background: #fff;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 4px 10px;
+      margin: 0 10px;
+      border: 1px solid var(--border);
+    }
+    .mockup-inner {
+      display: flex;
+      height: 380px;
+    }
+    .mockup-sidebar {
+      width: 200px;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      padding: 16px 12px;
+      flex-shrink: 0;
+    }
+    .mock-logo {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mock-logo-dot {
+      width: 18px; height: 18px;
+      background: var(--accent);
+      border-radius: 5px;
+    }
+    .mock-section {
+      font-size: 9px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 14px 6px 6px;
+    }
+    .mock-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .mock-nav.active {
+      background: rgba(170,235,61,0.12);
+      border-left: 3px solid var(--accent);
+    }
+    .mock-badge {
+      margin-left: auto;
+      background: var(--bg3);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 999px;
+      color: var(--muted);
+    }
+    .mock-badge.lime { background: var(--accent); color: var(--accent-text); }
+    .mockup-main {
+      flex: 1;
+      padding: 16px;
+      background: #f4f5f7;
+      overflow: hidden;
+    }
+    .mock-admin-banner {
+      background: var(--accent);
+      padding: 5px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-text);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mock-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .mock-stat {
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid var(--border);
+    }
+    .mock-stat-val {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .mock-stat-label {
+      font-size: 9px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .mock-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .mock-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+    }
+    .mock-card-icon {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .mock-card-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .mock-card-sub {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .mock-card-count {
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg3);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 520px;
+      font-weight: 500;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    /* ── FEATURE GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .feature-card {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 26px 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .feature-icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── ROLES SECTION ── */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+    .role-card {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .role-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .role-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .role-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .dept-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 30px; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), #7ab52e);
+      z-index: 0;
+    }
+    .step {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .step-num {
+      width: 44px; height: 44px;
+      background: var(--accent);
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--accent-text);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .step h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .step p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── STATS BAND ── */
+    .stats-band {
+      background: #0d1117;
+      padding: 60px 24px;
+    }
+    .stats-band-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+    .band-stat-val {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 44px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .band-stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── DEPT SECTION ── */
+    .dept-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    .dept-card {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .dept-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .dept-emoji {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .dept-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .dept-count {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── TESTIMONIAL / QUOTE ── */
+    .quote-section {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 48px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .quote-section::before {
+      content: '"';
+      position: absolute;
+      top: -20px; left: 24px;
+      font-size: 160px;
+      font-family: 'Instrument Serif', serif;
+      color: var(--accent);
+      opacity: 0.2;
+      line-height: 1;
+    }
+    .quote-text {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--text);
+      line-height: 1.6;
+      max-width: 700px;
+      margin: 0 auto 24px;
+      position: relative;
+    }
+    .quote-author {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text2);
+    }
+    .quote-role-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── CTA FOOTER ── */
+    .cta-section {
+      background: #0d1117;
+      padding: 80px 24px;
+      text-align: center;
+    }
+    .cta-section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .cta-section p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.55);
+      max-width: 480px;
+      margin: 0 auto 36px;
+      font-weight: 500;
+    }
+    .cta-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-outline {
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 13px 28px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+    /* ── PAGE FOOTER ── */
+    .page-footer {
+      background: #0d1117;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 24px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 800; color: #fff;
+    }
+    .footer-logo-dot {
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .features-grid, .dept-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps, .stats-band-inner { grid-template-columns: repeat(2, 1fr); }
+      .steps::before { display: none; }
+      .roles-grid { grid-template-columns: 1fr; }
+      .mockup-inner { height: auto; }
+      .mockup-sidebar { display: none; }
+      .mock-stats, .mock-cards { grid-template-columns: repeat(2, 1fr); }
+      .topbar { padding: 0 20px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <nav class="topbar">
+    <a class="logo" href="#">
+      <div class="logo-dot">📊</div>
+      REPORTING HUB
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#access">Access Control</a></li>
+      <li><a href="#departments">Departments</a></li>
+      <li><a href="#get-started" class="nav-cta">Get Started →</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">Now Live — Internal Use Only</div>
+    <h1>One Hub for<br/><em>All</em> Your Dashboards</h1>
+    <p>Reporting HUB centralises every department's dashboards — Power BI, Excel, HTML reports — in one secure, role-scoped platform.</p>
+    <div class="hero-actions">
+      <a href="#get-started" class="btn-primary">Access the Hub →</a>
+      <a href="#features" class="btn-accent">See Features</a>
+    </div>
+  </div>
+
+  <!-- MOCKUP -->
+  <div class="mockup-wrap">
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ff5f57;"></div>
+        <div class="mockup-dot" style="background:#ffbd2e;"></div>
+        <div class="mockup-dot" style="background:#28ca41;"></div>
+        <div class="mockup-url">reporting-hub.internal / #/home</div>
+      </div>
+      <div class="mockup-inner">
+        <!-- Sidebar -->
+        <div class="mockup-sidebar">
+          <div class="mock-logo"><div class="mock-logo-dot"></div> REPORTING HUB</div>
+          <div class="mock-nav active">🏠 Overview <span class="mock-badge lime">Home</span></div>
+          <div class="mock-section">DEPARTMENTS</div>
+          <div class="mock-nav">⚙️ Operations <span class="mock-badge">4</span></div>
+          <div class="mock-nav">💰 Accounts Rec. <span class="mock-badge">3</span></div>
+          <div class="mock-nav">📈 Finance <span class="mock-badge">5</span></div>
+          <div class="mock-nav">👥 HR <span class="mock-badge">2</span></div>
+          <div class="mock-nav">🚀 Sales <span class="mock-badge">6</span></div>
+          <div class="mock-section">QUICK LINKS</div>
+          <div class="mock-nav" style="color:#6b7280;">⭐ AR CFO Report</div>
+          <div class="mock-nav" style="color:#6b7280;">⭐ Sales Q1 2026</div>
+        </div>
+        <!-- Main -->
+        <div class="mockup-main">
+          <div class="mock-admin-banner">👑 Admin Mode — Full edit access &nbsp;&nbsp; Switch to Viewer →</div>
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-val">20</div>
+              <div class="mock-stat-label">Dashboards</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-val">5</div>
+              <div class="mock-stat-label">Departments</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-val">38</div>
+              <div class="mock-stat-label">Active Users</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-val">99%</div>
+              <div class="mock-stat-label">Uptime</div>
+            </div>
+          </div>
+          <div class="mock-cards">
+            <div class="mock-card">
+              <div class="mock-card-icon">⚙️</div>
+              <div class="mock-card-name">Operations</div>
+              <div class="mock-card-sub">Efficiency & logistics</div>
+              <div class="mock-card-count" style="color:#ff5722;">4 dashboards</div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-card-icon">📈</div>
+              <div class="mock-card-name">Finance</div>
+              <div class="mock-card-sub">P&L, budgets, forecasts</div>
+              <div class="mock-card-count" style="color:#7c3aed;">5 dashboards</div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-card-icon">🚀</div>
+              <div class="mock-card-name">Sales</div>
+              <div class="mock-card-sub">Pipeline & revenue</div>
+              <div class="mock-card-count" style="color:#16a34a;">6 dashboards</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS BAND -->
+  <div class="stats-band">
+    <div class="stats-band-inner">
+      <div>
+        <div class="band-stat-val">5</div>
+        <div class="band-stat-label">Departments Connected</div>
+      </div>
+      <div>
+        <div class="band-stat-val">20+</div>
+        <div class="band-stat-label">Dashboards Hosted</div>
+      </div>
+      <div>
+        <div class="band-stat-val">38</div>
+        <div class="band-stat-label">Active Team Members</div>
+      </div>
+      <div>
+        <div class="band-stat-val">99%</div>
+        <div class="band-stat-label">Platform Uptime</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">✦ Features</div>
+    <h2 class="section-title">Everything your team needs,<br/>nothing they don't.</h2>
+    <p class="section-sub">Built lean and fast — no bloat, no steep learning curve. Just dashboards, organised and accessible.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(170,235,61,0.15);">📤</div>
+        <h3>Upload Any Dashboard</h3>
+        <p>Upload HTML reports or paste Power BI, Excel Online, Looker, Tableau, or any embed URL — it just works.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(2,132,199,0.1);">🔐</div>
+        <h3>Role-Based Access</h3>
+        <p>Create custom roles with PIN access. Each team only sees the departments assigned to them — nothing more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(124,58,237,0.1);">🌙</div>
+        <h3>Light & Dark Themes</h3>
+        <p>Professional light theme by default. One click switches to a rich dark mode — preference saved per user.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(219,39,119,0.1);">⚡</div>
+        <h3>Instant Search</h3>
+        <p>Real-time search across all dashboards — scoped to the user's role. Find anything in milliseconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.1);">⭐</div>
+        <h3>Favourites & Recent</h3>
+        <p>Each user can star frequently used dashboards. Recently viewed appears automatically in Quick Links.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.1);">📋</div>
+        <h3>Activity Feed</h3>
+        <p>Live audit trail of recent uploads, edits, and updates. Always know what changed and when.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-label">✦ How It Works</div>
+    <h2 class="section-title">Up and running in minutes.</h2>
+    <p class="section-sub">From first login to a fully organised dashboard hub — four simple steps.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Admin Logs In</h3>
+        <p>Siby enters the Admin PIN. Full edit access is granted instantly.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Add Dashboards</h3>
+        <p>Upload HTML files or paste embed URLs per department. Done in seconds.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Create Team Roles</h3>
+        <p>Define roles like "HR Team" or "Finance Viewers" with custom PINs and department access.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Teams Access</h3>
+        <p>Staff open the URL, pick their role, enter PIN — and see only their dashboards.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ACCESS CONTROL -->
+  <section id="access">
+    <div class="section-label">✦ Access Control</div>
+    <h2 class="section-title">The right data to<br/>the right people.</h2>
+    <p class="section-sub">No one sees what they shouldn't. Every role is scoped precisely by the Admin.</p>
+    <div class="roles-grid">
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(217,119,6,0.1);">👑</div>
+        <div>
+          <h3>Admin (Siby)</h3>
+          <p>Full access — add/edit/delete departments, dashboards, and roles. Manages the entire platform.</p>
+          <div class="dept-chips">
+            <span class="chip" style="background:rgba(170,235,61,0.15);color:#3d6b00;">All Departments</span>
+            <span class="chip" style="background:rgba(217,119,6,0.1);color:#92400e;">Full Control</span>
+          </div>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(219,39,119,0.1);">👥</div>
+        <div>
+          <h3>HR Team</h3>
+          <p>View-only access. Sees HR dashboards only. PIN-protected. No edit or delete controls visible.</p>
+          <div class="dept-chips">
+            <span class="chip" style="background:rgba(219,39,119,0.1);color:#9d174d;">HR</span>
+          </div>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(124,58,237,0.1);">📈</div>
+        <div>
+          <h3>Finance Viewers</h3>
+          <p>Access to Finance and Accounts Receivables. All other departments are completely hidden.</p>
+          <div class="dept-chips">
+            <span class="chip" style="background:rgba(124,58,237,0.1);color:#5b21b6;">Finance</span>
+            <span class="chip" style="background:rgba(2,132,199,0.1);color:#075985;">Accounts Rec.</span>
+          </div>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(22,163,74,0.1);">🚀</div>
+        <div>
+          <h3>Sales Team</h3>
+          <p>Sales dashboards only. Clean, focused view with no distractions from other departments.</p>
+          <div class="dept-chips">
+            <span class="chip" style="background:rgba(22,163,74,0.1);color:#14532d;">Sales</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- DEPARTMENTS -->
+  <section id="departments">
+    <div class="section-label">✦ Departments</div>
+    <h2 class="section-title">All 5 departments,<br/>one unified hub.</h2>
+    <p class="section-sub">Each department has its own space, colour, and set of dashboards — fully managed by Admin.</p>
+    <div class="dept-grid">
+      <div class="dept-card">
+        <div class="dept-emoji">⚙️</div>
+        <div class="dept-name">Operations</div>
+        <div class="dept-count" style="color:#ff5722;">4 dashboards</div>
+      </div>
+      <div class="dept-card">
+        <div class="dept-emoji">💰</div>
+        <div class="dept-name">Accounts Rec.</div>
+        <div class="dept-count" style="color:#0284c7;">3 dashboards</div>
+      </div>
+      <div class="dept-card">
+        <div class="dept-emoji">📈</div>
+        <div class="dept-name">Finance</div>
+        <div class="dept-count" style="color:#7c3aed;">5 dashboards</div>
+      </div>
+      <div class="dept-card">
+        <div class="dept-emoji">👥</div>
+        <div class="dept-name">HR</div>
+        <div class="dept-count" style="color:#db2777;">2 dashboards</div>
+      </div>
+      <div class="dept-card">
+        <div class="dept-emoji">🚀</div>
+        <div class="dept-name">Sales</div>
+        <div class="dept-count" style="color:#16a34a;">6 dashboards</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- QUOTE -->
+  <section>
+    <div class="quote-section">
+      <p class="quote-text">We built Reporting HUB so every team can access exactly the data they need — nothing more, nothing less. One URL, one login, and your dashboards are right there.</p>
+      <div class="quote-author">Siby — Admin & Project Owner</div>
+      <div class="quote-role-label">Reporting HUB · Internal Platform</div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section" id="get-started">
+    <h2>Ready to explore the hub?</h2>
+    <p>Open the Reporting HUB in your browser and log in with your assigned role and PIN.</p>
+    <div class="cta-actions">
+      <a href="http://localhost:3000" class="btn-accent">Open Reporting HUB →</a>
+      <a href="#features" class="btn-outline">Review Features</a>
+    </div>
+  </div>
+
+  <!-- PAGE FOOTER -->
+  <footer class="page-footer">
+    <div class="footer-logo">
+      <div class="footer-logo-dot">📊</div>
+      REPORTING HUB
+    </div>
+    <div class="footer-copy">Internal use only · Built for the team · 2026</div>
+  </footer>
+
+</body>
+</html>

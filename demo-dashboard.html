@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales Performance Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #f4f5f7;
+      color: #0d1117;
+      padding: 28px;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .header-left h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0d1117;
+    }
+    .header-left p {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 3px;
+    }
+    .badge {
+      background: #aaeb3d;
+      color: #3d6b00;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 999px;
+    }
+
+    /* Stats Row */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px 22px;
+      border: 1px solid rgba(0,0,0,0.07);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 18px 18px 0 0;
+    }
+    .stat-card.green::before  { background: linear-gradient(90deg, #aaeb3d, #16a34a); }
+    .stat-card.blue::before   { background: linear-gradient(90deg, #0284c7, #06b6d4); }
+    .stat-card.purple::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+    .stat-card.pink::before   { background: linear-gradient(90deg, #db2777, #f472b6); }
+    .stat-icon {
+      font-size: 20px;
+      position: absolute;
+      top: 18px; right: 18px;
+    }
+    .stat-value {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 32px;
+      color: #0d1117;
+      margin-top: 6px;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .stat-change {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      color: #16a34a;
+    }
+    .stat-change.down { color: #dc2626; }
+
+    /* Grid Layout */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    /* Cards */
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px 24px;
+      border: 1px solid rgba(0,0,0,0.07);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0d1117;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title span {
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    /* Bar Chart */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 160px;
+      margin-top: 8px;
+    }
+    .bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      transition: opacity 0.2s;
+    }
+    .bar:hover { opacity: 0.8; }
+    .bar-label {
+      font-size: 11px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    .bar-val {
+      font-size: 11px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    /* Line Chart (SVG) */
+    .line-chart svg {
+      width: 100%;
+      height: 140px;
+    }
+
+    /* Donut Chart */
+    .donut-wrap {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 8px;
+    }
+    .donut-wrap svg {
+      flex-shrink: 0;
+    }
+    .donut-legend {
+      flex: 1;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-name {
+      font-size: 12px;
+      color: #374151;
+      font-weight: 500;
+      flex: 1;
+    }
+    .legend-pct {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0d1117;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+    }
+    th {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      font-size: 13px;
+      color: #374151;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f9fafb; }
+    .rep-name { font-weight: 600; color: #0d1117; }
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pill.on-track  { background: rgba(22,163,74,0.1);  color: #16a34a; }
+    .pill.at-risk   { background: rgba(234,179,8,0.12); color: #a16207; }
+    .pill.exceeded  { background: rgba(170,235,61,0.2); color: #3d6b00; }
+
+    /* Progress bars */
+    .progress-row {
+      margin-bottom: 14px;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .progress-name { font-weight: 600; color: #374151; }
+    .progress-val  { font-weight: 700; color: #0d1117; }
+    .progress-track {
+      height: 8px;
+      background: #f0f1f5;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1s ease;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Sales Performance Dashboard</h1>
+      <p>Q1 2026 — Updated March 20, 2026</p>
+    </div>
+    <div class="badge">Live Data</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card green">
+      <div class="stat-icon">💰</div>
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-value">$4.2M</div>
+      <div class="stat-change">↑ 18% vs last quarter</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-icon">📋</div>
+      <div class="stat-label">Deals Closed</div>
+      <div class="stat-value">312</div>
+      <div class="stat-change">↑ 24 new this month</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-label">Quota Attainment</div>
+      <div class="stat-value">87%</div>
+      <div class="stat-change">↑ 5% vs Q4 2025</div>
+    </div>
+    <div class="stat-card pink">
+      <div class="stat-icon">⏱</div>
+      <div class="stat-label">Avg Deal Cycle</div>
+      <div class="stat-value">18d</div>
+      <div class="stat-change down">↑ 2 days longer</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Bar Chart + Donut -->
+  <div class="grid-2">
+
+    <!-- Monthly Revenue Bar Chart -->
+    <div class="card">
+      <div class="card-title">Monthly Revenue <span>Jan – Mar 2026</span></div>
+      <div class="bar-chart">
+        <div class="bar-group">
+          <div class="bar-val">$1.1M</div>
+          <div class="bar" style="height:70%; background: linear-gradient(180deg,#aaeb3d,#7ab52e);"></div>
+          <div class="bar-label">Jan</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-val">$1.4M</div>
+          <div class="bar" style="height:88%; background: linear-gradient(180deg,#aaeb3d,#7ab52e);"></div>
+          <div class="bar-label">Feb</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-val">$1.7M</div>
+          <div class="bar" style="height:100%; background: linear-gradient(180deg,#4caf50,#1a6e1a);"></div>
+          <div class="bar-label">Mar</div>
+        </div>
+        <div class="bar-group" style="opacity:0.35;">
+          <div class="bar-val" style="color:#9ca3af;">Target</div>
+          <div class="bar" style="height:82%; background: #e5e7eb; border: 2px dashed #d1d5db;"></div>
+          <div class="bar-label" style="color:#9ca3af;">Avg</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut: Revenue by Region -->
+    <div class="card">
+      <div class="card-title">Revenue by Region</div>
+      <div class="donut-wrap">
+        <svg width="110" height="110" viewBox="0 0 36 36">
+          <!-- North: 38% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#aaeb3d" stroke-width="4"
+            stroke-dasharray="38 62" stroke-dashoffset="25" />
+          <!-- South: 27% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#0284c7" stroke-width="4"
+            stroke-dasharray="27 73" stroke-dashoffset="-13" />
+          <!-- East: 20% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#7c3aed" stroke-width="4"
+            stroke-dasharray="20 80" stroke-dashoffset="-40" />
+          <!-- West: 15% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#db2777" stroke-width="4"
+            stroke-dasharray="15 85" stroke-dashoffset="-60" />
+          <text x="18" y="20" text-anchor="middle" font-size="5.5" font-family="Plus Jakarta Sans" font-weight="700" fill="#0d1117">Q1</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#aaeb3d;"></div><span class="legend-name">North</span><span class="legend-pct">38%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#0284c7;"></div><span class="legend-name">South</span><span class="legend-pct">27%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;"></div><span class="legend-name">East</span><span class="legend-pct">20%</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#db2777;"></div><span class="legend-name">West</span><span class="legend-pct">15%</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: Pipeline Progress + Rep Table -->
+  <div class="grid-2">
+
+    <!-- Pipeline by Stage -->
+    <div class="card">
+      <div class="card-title">Pipeline by Stage <span>Active deals</span></div>
+      <div class="progress-row">
+        <div class="progress-header"><span class="progress-name">Prospecting</span><span class="progress-val">$2.1M &nbsp;·&nbsp; 84 deals</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%; background:#aaeb3d;"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-header"><span class="progress-name">Qualification</span><span class="progress-val">$1.6M &nbsp;·&nbsp; 61 deals</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:76%; background:#0284c7;"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-header"><span class="progress-name">Proposal Sent</span><span class="progress-val">$980K &nbsp;·&nbsp; 38 deals</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:47%; background:#7c3aed;"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-header"><span class="progress-name">Negotiation</span><span class="progress-val">$540K &nbsp;·&nbsp; 19 deals</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:26%; background:#db2777;"></div></div>
+      </div>
+      <div class="progress-row" style="margin-bottom:0;">
+        <div class="progress-header"><span class="progress-name">Closed Won</span><span class="progress-val">$4.2M &nbsp;·&nbsp; 312 deals</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%; background: linear-gradient(90deg,#16a34a,#aaeb3d);"></div></div>
+      </div>
+    </div>
+
+    <!-- Top Reps -->
+    <div class="card">
+      <div class="card-title">Top Sales Reps <span>by revenue</span></div>
+      <table>
+        <thead>
+          <tr><th>Rep</th><th>Revenue</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rep-name">Nancy K.</td><td>$920K</td><td><span class="pill exceeded">Exceeded</span></td></tr>
+          <tr><td class="rep-name">Todd M.</td><td>$840K</td><td><span class="pill exceeded">Exceeded</span></td></tr>
+          <tr><td class="rep-name">Sandi R.</td><td>$710K</td><td><span class="pill on-track">On Track</span></td></tr>
+          <tr><td class="rep-name">Chandru V.</td><td>$620K</td><td><span class="pill on-track">On Track</span></td></tr>
+          <tr><td class="rep-name">Alex P.</td><td>$480K</td><td><span class="pill at-risk">At Risk</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="footer">Reporting HUB · Sales Department · Data as of March 20, 2026</div>
+
+</body>
+</html>
